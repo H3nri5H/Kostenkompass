@@ -34,16 +34,21 @@ jobs:
       - name: Generate PNG assets
         run: node scripts/generate-brand-assets.mjs
 
-      - name: Commit generated assets
+      - name: Update package metadata
+        run: |
+          npm pkg set name=spendfox-mobile version=0.3.0
+          npm install --package-lock-only --ignore-scripts
+
+      - name: Commit generated files
         shell: bash
         run: |
-          if git diff --quiet -- assets; then
-            echo "Brand assets are already current."
+          if git diff --quiet -- assets package.json package-lock.json; then
+            echo "Generated files are already current."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets
+          git add assets package.json package-lock.json
           git commit -m "chore: generate SpendFox brand assets"
           git push origin polish

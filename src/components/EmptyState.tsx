@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useAppTheme } from '@/theme/theme';
 
 interface EmptyStateProps {
-  icon: 'receipt-outline' | 'cube-outline' | 'pie-chart-outline';
+  icon: 'receipt-outline' | 'cube-outline' | 'pie-chart-outline' | 'car-outline';
   title: string;
   description: string;
 }
@@ -14,7 +14,7 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconContainer, { backgroundColor: theme.colors.primarySoft }]}>
+      <View style={[styles.iconContainer, { backgroundColor: theme.colors.primarySoft }]}> 
         <Ionicons color={theme.colors.primary} name={icon} size={28} />
       </View>
       <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>

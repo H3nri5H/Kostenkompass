@@ -34,7 +34,7 @@ export default function EditVehiclePartScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator color={theme.colors.primary} size="large" />
       </View>
     );
@@ -42,7 +42,7 @@ export default function EditVehiclePartScreen() {
 
   if (!part || !partId || !vehicleId) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <Text style={{ color: theme.colors.text }}>Teil nicht gefunden.</Text>
       </View>
     );

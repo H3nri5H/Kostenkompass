@@ -40,12 +40,12 @@ export default function AccountScreen() {
         />
 
         <SurfaceCard style={styles.profileCard}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primarySoft }]}> 
+          <View style={[styles.avatar, { backgroundColor: theme.colors.primarySoft }]}>
             <Ionicons color={theme.colors.primary} name="person-outline" size={28} />
           </View>
           <View style={styles.profileCopy}>
             <Text style={[styles.label, { color: theme.colors.textMuted }]}>Angemeldet als</Text>
-            <Text selectable style={[styles.email, { color: theme.colors.text }]}> 
+            <Text selectable style={[styles.email, { color: theme.colors.text }]}>
               {user?.email ?? 'Unbekanntes Konto'}
             </Text>
           </View>
@@ -53,7 +53,7 @@ export default function AccountScreen() {
 
         <SurfaceCard style={styles.infoCard}>
           <Text style={[styles.infoTitle, { color: theme.colors.text }]}>Darstellung</Text>
-          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}> 
+          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}>
             Hell und Dunkel können unabhängig von der Systemeinstellung gewählt werden.
           </Text>
           <ThemeModeSelector />
@@ -75,7 +75,7 @@ export default function AccountScreen() {
 
         <SurfaceCard style={styles.infoCard}>
           <Text style={[styles.infoTitle, { color: theme.colors.text }]}>Abmelden</Text>
-          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}> 
+          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}>
             Die Daten bleiben im Konto erhalten. Du kannst dich anschließend auf diesem oder einem
             anderen Gerät erneut anmelden.
           </Text>
@@ -107,7 +107,7 @@ function StatusRow({
       <Ionicons color={theme.colors.primary} name={icon} size={23} />
       <View style={styles.statusCopy}>
         <Text style={[styles.statusTitle, { color: theme.colors.text }]}>{title}</Text>
-        <Text style={[styles.statusDescription, { color: theme.colors.textMuted }]}> 
+        <Text style={[styles.statusDescription, { color: theme.colors.textMuted }]}>
           {description}
         </Text>
       </View>

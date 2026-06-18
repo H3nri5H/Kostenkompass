@@ -15,7 +15,7 @@ export default function NewVehiclePartScreen() {
 
   if (!vehicleId) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <Text style={{ color: theme.colors.text }}>Auto nicht gefunden.</Text>
       </View>
     );

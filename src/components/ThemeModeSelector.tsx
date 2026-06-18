@@ -3,11 +3,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { type ThemeMode, useAppTheme, useThemePreference } from '@/theme/theme';
 
-const OPTIONS: Array<{
+const OPTIONS: {
   mode: ThemeMode;
   label: string;
   icon: 'phone-portrait-outline' | 'sunny-outline' | 'moon-outline';
-}> = [
+}[] = [
   { mode: 'system', label: 'System', icon: 'phone-portrait-outline' },
   { mode: 'light', label: 'Hell', icon: 'sunny-outline' },
   { mode: 'dark', label: 'Dunkel', icon: 'moon-outline' },
@@ -43,10 +43,7 @@ export function ThemeModeSelector() {
               size={20}
             />
             <Text
-              style={[
-                styles.label,
-                { color: selected ? theme.colors.primary : theme.colors.text },
-              ]}
+              style={[styles.label, { color: selected ? theme.colors.primary : theme.colors.text }]}
             >
               {option.label}
             </Text>

@@ -32,9 +32,7 @@ export function validateLicensePlate(value: string): string | null {
 
 export function validateKba(value: string): string | null {
   if (!value.trim()) return null;
-  return KBA_PATTERN.test(normalizeUppercase(value))
-    ? null
-    : 'KBA bitte als HSN und TSN angeben.';
+  return KBA_PATTERN.test(normalizeUppercase(value)) ? null : 'KBA bitte als HSN und TSN angeben.';
 }
 
 export function validateVehicleCode(value: string, label: string): string | null {

@@ -3,33 +3,23 @@ import { formatKilometers, getInspectionState, getPartServiceState } from '@/dom
 describe('vehicle due calculations', () => {
   it('calculates the next replacement odometer and due state', () => {
     expect(
-      getPartServiceState(
-        { lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 },
-        112000,
-      ),
+      getPartServiceState({ lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 }, 112000),
     ).toEqual({ state: 'ok', nextDueOdometerKm: 115000, remainingKm: 3000 });
 
     expect(
-      getPartServiceState(
-        { lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 },
-        114000,
-      ).state,
+      getPartServiceState({ lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 }, 114000)
+        .state,
     ).toBe('soon');
 
     expect(
-      getPartServiceState(
-        { lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 },
-        115001,
-      ).state,
+      getPartServiceState({ lastReplacedOdometerKm: 100000, replacementIntervalKm: 15000 }, 115001)
+        .state,
     ).toBe('due');
   });
 
   it('returns not configured without required values', () => {
     expect(
-      getPartServiceState(
-        { lastReplacedOdometerKm: null, replacementIntervalKm: 15000 },
-        120000,
-      ),
+      getPartServiceState({ lastReplacedOdometerKm: null, replacementIntervalKm: 15000 }, 120000),
     ).toEqual({ state: 'not_configured', nextDueOdometerKm: null, remainingKm: null });
   });
 

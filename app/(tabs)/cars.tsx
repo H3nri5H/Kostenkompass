@@ -108,14 +108,14 @@ export default function CarsScreen() {
             >
               <SurfaceCard>
                 <View style={styles.cardHeader}>
-                  <View style={[styles.iconBox, { backgroundColor: theme.colors.primarySoft }]}> 
+                  <View style={[styles.iconBox, { backgroundColor: theme.colors.primarySoft }]}>
                     <Ionicons color={theme.colors.primary} name="car-outline" size={24} />
                   </View>
                   <View style={styles.titleCopy}>
-                    <Text style={[styles.title, { color: theme.colors.text }]}> 
+                    <Text style={[styles.title, { color: theme.colors.text }]}>
                       {item.vehicle.displayName}
                     </Text>
-                    <Text style={[styles.meta, { color: theme.colors.textMuted }]}> 
+                    <Text style={[styles.meta, { color: theme.colors.textMuted }]}>
                       {[
                         item.vehicle.manufacturer,
                         item.vehicle.model,
@@ -158,12 +158,12 @@ export default function CarsScreen() {
                   </Text>
                 ) : null}
 
-                <View style={[styles.footer, { borderTopColor: theme.colors.border }]}> 
-                  <Text style={[styles.footerText, { color: theme.colors.textMuted }]}> 
+                <View style={[styles.footer, { borderTopColor: theme.colors.border }]}>
+                  <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
                     {item.fuelEntryCount} Tankvorgänge · {formatEuro(item.totalFuelCostCents)}
                   </Text>
                   {alertCount > 0 ? (
-                    <Text style={[styles.partsBadge, { color: theme.colors.danger }]}> 
+                    <Text style={[styles.partsBadge, { color: theme.colors.danger }]}>
                       Hinweise: {alertCount}
                     </Text>
                   ) : null}
@@ -181,7 +181,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   const theme = useAppTheme();
 
   return (
-    <View style={[styles.metric, { backgroundColor: theme.colors.surfaceMuted }]}> 
+    <View style={[styles.metric, { backgroundColor: theme.colors.surfaceMuted }]}>
       <Text style={[styles.metricLabel, { color: theme.colors.textMuted }]}>{label}</Text>
       <Text style={[styles.metricValue, { color: theme.colors.text }]}>{value}</Text>
     </View>

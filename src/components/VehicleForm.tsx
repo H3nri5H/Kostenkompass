@@ -28,12 +28,7 @@ interface VehicleFormProps {
   onCancel: () => void;
 }
 
-export function VehicleForm({
-  initialVehicle,
-  submitLabel,
-  onSubmit,
-  onCancel,
-}: VehicleFormProps) {
+export function VehicleForm({ initialVehicle, submitLabel, onSubmit, onCancel }: VehicleFormProps) {
   const theme = useAppTheme();
   const [displayName, setDisplayName] = useState(initialVehicle?.displayName ?? '');
   const [manufacturer, setManufacturer] = useState(initialVehicle?.manufacturer ?? '');
@@ -43,16 +38,10 @@ export function VehicleForm({
   const [vin, setVin] = useState(initialVehicle?.vin ?? '');
   const [kba, setKba] = useState(initialVehicle?.kba ?? '');
   const [engineCode, setEngineCode] = useState(initialVehicle?.engineCode ?? '');
-  const [transmissionCode, setTransmissionCode] = useState(
-    initialVehicle?.transmissionCode ?? '',
-  );
+  const [transmissionCode, setTransmissionCode] = useState(initialVehicle?.transmissionCode ?? '');
   const [year, setYear] = useState(initialVehicle?.firstRegistrationYear?.toString() ?? '');
-  const [lastInspectionOn, setLastInspectionOn] = useState(
-    initialVehicle?.lastInspectionOn ?? '',
-  );
-  const [nextInspectionOn, setNextInspectionOn] = useState(
-    initialVehicle?.nextInspectionOn ?? '',
-  );
+  const [lastInspectionOn, setLastInspectionOn] = useState(initialVehicle?.lastInspectionOn ?? '');
+  const [nextInspectionOn, setNextInspectionOn] = useState(initialVehicle?.nextInspectionOn ?? '');
   const [notes, setNotes] = useState(initialVehicle?.notes ?? '');
   const [lastInspectionOpen, setLastInspectionOpen] = useState(false);
   const [nextInspectionOpen, setNextInspectionOpen] = useState(false);
@@ -100,9 +89,7 @@ export function VehicleForm({
         vin: vin.trim() ? normalizeVin(vin) : null,
         kba: kba.trim() ? normalizeUppercase(kba) : null,
         engineCode: engineCode.trim() ? normalizeUppercase(engineCode) : null,
-        transmissionCode: transmissionCode.trim()
-          ? normalizeUppercase(transmissionCode)
-          : null,
+        transmissionCode: transmissionCode.trim() ? normalizeUppercase(transmissionCode) : null,
         firstRegistrationYear: parsedYear,
         lastInspectionOn: lastInspectionOn || null,
         nextInspectionOn: nextInspectionOn || null,
@@ -123,13 +110,27 @@ export function VehicleForm({
       onSecondaryPress={onCancel}
       primaryLabel={submitLabel}
     >
-      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
+      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
         <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Fahrzeugdaten</Text>
-        <Text style={[styles.infoText, { color: theme.colors.text }]}>Stammdaten und HU/AU-Termine können jederzeit erneut bearbeitet werden.</Text>
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>
+          Stammdaten und HU/AU-Termine können jederzeit erneut bearbeitet werden.
+        </Text>
       </SurfaceCard>
 
-      <FormField autoFocus={!initialVehicle} label="Anzeigename" maxLength={160} onChangeText={setDisplayName} value={displayName} />
-      <FormField autoCapitalize="words" label="Hersteller" maxLength={100} onChangeText={setManufacturer} value={manufacturer} />
+      <FormField
+        autoFocus={!initialVehicle}
+        label="Anzeigename"
+        maxLength={160}
+        onChangeText={setDisplayName}
+        value={displayName}
+      />
+      <FormField
+        autoCapitalize="words"
+        label="Hersteller"
+        maxLength={100}
+        onChangeText={setManufacturer}
+        value={manufacturer}
+      />
       <FormField label="Modell" maxLength={120} onChangeText={setModel} value={model} />
 
       <View style={styles.group}>
@@ -152,7 +153,12 @@ export function VehicleForm({
                   },
                 ]}
               >
-                <Text style={{ color: selected ? theme.colors.primary : theme.colors.text, fontWeight: '700' }}>
+                <Text
+                  style={{
+                    color: selected ? theme.colors.primary : theme.colors.text,
+                    fontWeight: '700',
+                  }}
+                >
                   {getFuelTypeLabel(type)}
                 </Text>
               </Pressable>
@@ -161,20 +167,78 @@ export function VehicleForm({
         </View>
       </View>
 
-      <FormField autoCapitalize="characters" error={licensePlateError} label="Kennzeichen" maxLength={12} onChangeText={setLicensePlate} value={licensePlate} />
-      <FormField autoCapitalize="characters" error={vinError} label="FIN / VIN" maxLength={20} onChangeText={setVin} value={vin} />
-      <FormField autoCapitalize="characters" error={kbaError} label="KBA (HSN / TSN)" maxLength={16} onChangeText={setKba} value={kba} />
-      <FormField autoCapitalize="characters" error={engineCodeError} label="Motorcode" maxLength={20} onChangeText={setEngineCode} value={engineCode} />
-      <FormField autoCapitalize="characters" error={transmissionCodeError} label="Getriebecode" maxLength={20} onChangeText={setTransmissionCode} value={transmissionCode} />
-      <FormField error={yearError} inputMode="numeric" keyboardType="number-pad" label="Baujahr / Erstzulassung" maxLength={4} onChangeText={setYear} value={year} />
+      <FormField
+        autoCapitalize="characters"
+        error={licensePlateError}
+        label="Kennzeichen"
+        maxLength={12}
+        onChangeText={setLicensePlate}
+        value={licensePlate}
+      />
+      <FormField
+        autoCapitalize="characters"
+        error={vinError}
+        label="FIN / VIN"
+        maxLength={20}
+        onChangeText={setVin}
+        value={vin}
+      />
+      <FormField
+        autoCapitalize="characters"
+        error={kbaError}
+        label="KBA (HSN / TSN)"
+        maxLength={16}
+        onChangeText={setKba}
+        value={kba}
+      />
+      <FormField
+        autoCapitalize="characters"
+        error={engineCodeError}
+        label="Motorcode"
+        maxLength={20}
+        onChangeText={setEngineCode}
+        value={engineCode}
+      />
+      <FormField
+        autoCapitalize="characters"
+        error={transmissionCodeError}
+        label="Getriebecode"
+        maxLength={20}
+        onChangeText={setTransmissionCode}
+        value={transmissionCode}
+      />
+      <FormField
+        error={yearError}
+        inputMode="numeric"
+        keyboardType="number-pad"
+        label="Baujahr / Erstzulassung"
+        maxLength={4}
+        onChangeText={setYear}
+        value={year}
+      />
 
-      <DateField label="Letzte HU/AU" onChange={setLastInspectionOn} onOpenChange={setLastInspectionOpen} open={lastInspectionOpen} optional value={lastInspectionOn} />
-      <DateField label="Nächste HU/AU" maximumDate={null} onChange={setNextInspectionOn} onOpenChange={setNextInspectionOpen} open={nextInspectionOpen} optional value={nextInspectionOn} />
+      <DateField
+        label="Letzte HU/AU"
+        onChange={setLastInspectionOn}
+        onOpenChange={setLastInspectionOpen}
+        open={lastInspectionOpen}
+        optional
+        value={lastInspectionOn}
+      />
+      <DateField
+        label="Nächste HU/AU"
+        maximumDate={null}
+        onChange={setNextInspectionOn}
+        onOpenChange={setNextInspectionOpen}
+        open={nextInspectionOpen}
+        optional
+        value={nextInspectionOn}
+      />
 
       <FormField label="Notizen" maxLength={1000} multiline onChangeText={setNotes} value={notes} />
 
       {formError ? (
-        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}> 
+        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
           <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
         </View>
       ) : null}

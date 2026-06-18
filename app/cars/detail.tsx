@@ -69,7 +69,7 @@ export default function CarDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator color={theme.colors.primary} size="large" />
       </SafeAreaView>
     );
@@ -77,7 +77,7 @@ export default function CarDetailScreen() {
 
   if (!vehicle || !vehicleId) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <Text style={{ color: theme.colors.text }}>Auto nicht gefunden.</Text>
       </SafeAreaView>
     );
@@ -149,14 +149,14 @@ export default function CarDetailScreen() {
             <View style={styles.list}>
               {fuelEntries.slice(0, 8).map((entry) => (
                 <View key={entry.id} style={styles.entryRow}>
-                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}> 
+                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
                     {formatDate(entry.occurredOn)} · {entry.odometerKm.toLocaleString('de-DE')} km
                   </Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
                     {formatLiters(entry.liters)} · {formatEuro(entry.totalCostCents)} ·{' '}
                     {formatFuelPrice(entry.pricePerLiterCents)}
                   </Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
                     Verbrauch: {formatConsumption(entry.consumptionLitersPer100Km)}
                   </Text>
                 </View>
@@ -183,21 +183,23 @@ export default function CarDetailScreen() {
                 return (
                   <View key={part.id} style={styles.partRow}>
                     <View style={styles.partCopy}>
-                      <Text style={[styles.entryTitle, { color: theme.colors.text }]}>{part.name}</Text>
-                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                      <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
+                        {part.name}
+                      </Text>
+                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
                         {[part.manufacturer, part.partNumber, part.specification]
                           .filter(Boolean)
                           .join(' · ') || 'Keine Teilenummer'}
                       </Text>
                       {service.nextDueOdometerKm !== null ? (
-                        <Text style={[styles.serviceText, { color: serviceColor }]}> 
+                        <Text style={[styles.serviceText, { color: serviceColor }]}>
                           Nächster Tausch bei {formatKilometers(service.nextDueOdometerKm)}
                           {service.remainingKm !== null
                             ? ` · ${service.remainingKm <= 0 ? 'fällig' : `${formatKilometers(service.remainingKm)} übrig`}`
                             : ''}
                         </Text>
                       ) : null}
-                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
                         {getPartStatusLabel(part.status)}
                       </Text>
                     </View>
@@ -251,7 +253,7 @@ function Spec({
   return (
     <View style={styles.specItem}>
       <Text style={[styles.specLabel, { color: theme.colors.textMuted }]}>{label}</Text>
-      <Text selectable style={[styles.specValue, { color: valueColor }]}> 
+      <Text selectable style={[styles.specValue, { color: valueColor }]}>
         {value || '—'}
       </Text>
     </View>

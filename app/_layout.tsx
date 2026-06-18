@@ -5,11 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { LoadingScreen } from '@/components/LoadingScreen';
-import {
-  AppThemeProvider,
-  createNavigationTheme,
-  useAppTheme,
-} from '@/theme/theme';
+import { AppThemeProvider, createNavigationTheme, useAppTheme } from '@/theme/theme';
 
 export default function RootLayout() {
   return (

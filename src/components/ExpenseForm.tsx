@@ -51,7 +51,7 @@ export default function ExpenseForm() {
 
   const amountCents = useMemo(() => parseEuroToCents(amount), [amount]);
   const amountError = amount
-    ? validatePositiveCents(amountCents, 'Der Betrag') ?? undefined
+    ? (validatePositiveCents(amountCents, 'Der Betrag') ?? undefined)
     : undefined;
 
   async function save() {
@@ -95,9 +95,9 @@ export default function ExpenseForm() {
       onSecondaryPress={() => router.back()}
       primaryLabel="Ausgabe speichern"
     >
-      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
+      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
         <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Ausgabe</Text>
-        <Text style={[styles.infoText, { color: theme.colors.text }]}> 
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>
           Die Zahlung wird deinem Konto zugeordnet und erscheint sofort in der Übersicht.
         </Text>
       </SurfaceCard>
@@ -113,7 +113,7 @@ export default function ExpenseForm() {
         value={amount}
       />
       {amountCents !== null && amountCents > 0 ? (
-        <Text style={[styles.amountPreview, { color: theme.colors.success }]}> 
+        <Text style={[styles.amountPreview, { color: theme.colors.success }]}>
           Erkannt: {formatEuro(amountCents)}
         </Text>
       ) : null}
@@ -136,7 +136,7 @@ export default function ExpenseForm() {
       <FormField label="Notiz" maxLength={1000} multiline onChangeText={setNote} value={note} />
 
       {formError ? (
-        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}> 
+        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
           <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
         </View>
       ) : null}

@@ -61,10 +61,10 @@ export default function NewAssetScreen() {
   const residualCents = useMemo(() => parseEuroToCents(residualValue), [residualValue]);
   const lifeMonths = Number(usefulLife);
   const priceError = purchasePrice
-    ? validatePositiveCents(priceCents, 'Der Kaufpreis') ?? undefined
+    ? (validatePositiveCents(priceCents, 'Der Kaufpreis') ?? undefined)
     : undefined;
   const residualError = residualValue
-    ? validateNonNegativeCents(residualCents, 'Der Restwert') ?? undefined
+    ? (validateNonNegativeCents(residualCents, 'Der Restwert') ?? undefined)
     : undefined;
   const lifeError =
     usefulLife && (!Number.isInteger(lifeMonths) || lifeMonths < 1 || lifeMonths > 1200)
@@ -133,33 +133,74 @@ export default function NewAssetScreen() {
       onSecondaryPress={() => router.back()}
       primaryLabel="Produkt speichern"
     >
-      <SurfaceCard style={[styles.info, { backgroundColor: theme.colors.primarySoft }]}> 
+      <SurfaceCard style={[styles.info, { backgroundColor: theme.colors.primarySoft }]}>
         <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Kauf und Nutzung</Text>
-        <Text style={[styles.infoText, { color: theme.colors.text }]}> 
-          Der Kaufpreis fließt in die Monatsübersicht ein; die Nutzungskosten bleiben separat sichtbar.
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>
+          Der Kaufpreis fließt in die Monatsübersicht ein; die Nutzungskosten bleiben separat
+          sichtbar.
         </Text>
       </SurfaceCard>
-      <FormField autoFocus label="Produktbezeichnung" maxLength={160} onChangeText={setName} value={name} />
-      <FormField label="Hersteller" maxLength={120} onChangeText={setManufacturer} value={manufacturer} />
+      <FormField
+        autoFocus
+        label="Produktbezeichnung"
+        maxLength={160}
+        onChangeText={setName}
+        value={name}
+      />
+      <FormField
+        label="Hersteller"
+        maxLength={120}
+        onChangeText={setManufacturer}
+        value={manufacturer}
+      />
       <FormField label="Modell" maxLength={120} onChangeText={setModel} value={model} />
       <CategoryPicker categories={categories} onChange={setCategoryId} selectedId={categoryId} />
-      <DateField label="Kaufdatum" onChange={setPurchasedOn} onOpenChange={setDateOpen} open={dateOpen} value={purchasedOn} />
-      <FormField error={priceError} inputMode="decimal" keyboardType="decimal-pad" label="Kaufpreis" onChangeText={setPurchasePrice} value={purchasePrice} />
-      <FormField error={residualError} hint="Erwarteter Wert am Ende der Nutzung." inputMode="decimal" keyboardType="decimal-pad" label="Restwert" onChangeText={setResidualValue} value={residualValue} />
-      <FormField error={lifeError} hint="Private wirtschaftliche Nutzung, keine steuerliche AfA." inputMode="numeric" keyboardType="number-pad" label="Nutzungsdauer in Monaten" onChangeText={setUsefulLife} value={usefulLife} />
+      <DateField
+        label="Kaufdatum"
+        onChange={setPurchasedOn}
+        onOpenChange={setDateOpen}
+        open={dateOpen}
+        value={purchasedOn}
+      />
+      <FormField
+        error={priceError}
+        inputMode="decimal"
+        keyboardType="decimal-pad"
+        label="Kaufpreis"
+        onChangeText={setPurchasePrice}
+        value={purchasePrice}
+      />
+      <FormField
+        error={residualError}
+        hint="Erwarteter Wert am Ende der Nutzung."
+        inputMode="decimal"
+        keyboardType="decimal-pad"
+        label="Restwert"
+        onChangeText={setResidualValue}
+        value={residualValue}
+      />
+      <FormField
+        error={lifeError}
+        hint="Private wirtschaftliche Nutzung, keine steuerliche AfA."
+        inputMode="numeric"
+        keyboardType="number-pad"
+        label="Nutzungsdauer in Monaten"
+        onChangeText={setUsefulLife}
+        value={usefulLife}
+      />
       {preview ? (
-        <SurfaceCard style={[styles.preview, { backgroundColor: theme.colors.primaryStrong }]}> 
-          <Text style={[styles.previewAmount, { color: theme.colors.onPrimary }]}> 
+        <SurfaceCard style={[styles.preview, { backgroundColor: theme.colors.primaryStrong }]}>
+          <Text style={[styles.previewAmount, { color: theme.colors.onPrimary }]}>
             {formatEuro(preview.monthly)} / Monat
           </Text>
-          <Text style={[styles.previewMeta, { color: theme.colors.onPrimary }]}> 
+          <Text style={[styles.previewMeta, { color: theme.colors.onPrimary }]}>
             Geplantes Ende am {formatDate(preview.end)}
           </Text>
         </SurfaceCard>
       ) : null}
       <FormField label="Notiz" maxLength={1000} multiline onChangeText={setNote} value={note} />
       {formError ? (
-        <View style={[styles.error, { backgroundColor: theme.colors.dangerSoft }]}> 
+        <View style={[styles.error, { backgroundColor: theme.colors.dangerSoft }]}>
           <Text style={{ color: theme.colors.danger, fontWeight: '700' }}>{formError}</Text>
         </View>
       ) : null}

@@ -33,7 +33,7 @@ export default function EditCarScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator color={theme.colors.primary} size="large" />
       </View>
     );
@@ -41,7 +41,7 @@ export default function EditCarScreen() {
 
   if (!vehicle || !vehicleId) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <Text style={{ color: theme.colors.text }}>Auto nicht gefunden.</Text>
       </View>
     );

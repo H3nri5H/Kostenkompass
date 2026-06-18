@@ -107,15 +107,41 @@ export function VehiclePartForm({
       onSecondaryPress={onCancel}
       primaryLabel={submitLabel}
     >
-      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
+      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
         <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Teilespezifikation</Text>
-        <Text style={[styles.infoText, { color: theme.colors.text }]}>Produktlink und Wechselintervall sind optional. Bei erreichtem Kilometerziel wird das Teil im Auto hervorgehoben.</Text>
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>
+          Produktlink und Wechselintervall sind optional. Bei erreichtem Kilometerziel wird das Teil
+          im Auto hervorgehoben.
+        </Text>
       </SurfaceCard>
 
-      <FormField autoFocus={!initialPart} label="Teilname" maxLength={160} onChangeText={setName} value={name} />
-      <FormField autoCapitalize="words" label="Hersteller" maxLength={120} onChangeText={setManufacturer} value={manufacturer} />
-      <FormField autoCapitalize="characters" label="Teilenummer" maxLength={80} onChangeText={setPartNumber} value={partNumber} />
-      <FormField label="Spezifikation" maxLength={240} onChangeText={setSpecification} value={specification} />
+      <FormField
+        autoFocus={!initialPart}
+        label="Teilname"
+        maxLength={160}
+        onChangeText={setName}
+        value={name}
+      />
+      <FormField
+        autoCapitalize="words"
+        label="Hersteller"
+        maxLength={120}
+        onChangeText={setManufacturer}
+        value={manufacturer}
+      />
+      <FormField
+        autoCapitalize="characters"
+        label="Teilenummer"
+        maxLength={80}
+        onChangeText={setPartNumber}
+        value={partNumber}
+      />
+      <FormField
+        label="Spezifikation"
+        maxLength={240}
+        onChangeText={setSpecification}
+        value={specification}
+      />
       <FormField label="Einbauort" maxLength={160} onChangeText={setLocation} value={location} />
       <FormField
         autoCapitalize="none"
@@ -165,7 +191,12 @@ export function VehiclePartForm({
                   },
                 ]}
               >
-                <Text style={{ color: selected ? theme.colors.primary : theme.colors.text, fontWeight: '700' }}>
+                <Text
+                  style={{
+                    color: selected ? theme.colors.primary : theme.colors.text,
+                    fontWeight: '700',
+                  }}
+                >
                   {getPartStatusLabel(option)}
                 </Text>
               </Pressable>
@@ -177,7 +208,7 @@ export function VehiclePartForm({
       <FormField label="Notiz" maxLength={1000} multiline onChangeText={setNote} value={note} />
 
       {formError ? (
-        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}> 
+        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
           <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
         </View>
       ) : null}

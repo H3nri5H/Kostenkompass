@@ -29,7 +29,7 @@ export function DateField({
 }: DateFieldProps) {
   const theme = useAppTheme();
   const date = parseIsoDate(value) ?? new Date();
-  const effectiveMaximumDate = maximumDate === undefined ? new Date() : maximumDate ?? undefined;
+  const effectiveMaximumDate = maximumDate === undefined ? new Date() : (maximumDate ?? undefined);
 
   function handleChange(event: DateTimePickerEvent, selectedDate?: Date) {
     if (Platform.OS === 'android') {
@@ -57,7 +57,9 @@ export function DateField({
         ]}
       >
         <Ionicons color={theme.colors.primary} name="calendar-outline" size={20} />
-        <Text style={[styles.value, { color: value ? theme.colors.text : theme.colors.textSubtle }]}>
+        <Text
+          style={[styles.value, { color: value ? theme.colors.text : theme.colors.textSubtle }]}
+        >
           {value ? formatDate(value) : 'Nicht gesetzt'}
         </Text>
         <Ionicons

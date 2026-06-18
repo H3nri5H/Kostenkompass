@@ -43,7 +43,9 @@ export default function NewFuelEntryScreen() {
   const distanceError =
     distance && distanceKm === null ? 'Die Strecke muss eine ganze Zahl sein.' : undefined;
   const litersError =
-    liters && (!litersValue || litersValue <= 0) ? 'Die Literangabe muss größer als 0 sein.' : undefined;
+    liters && (!litersValue || litersValue <= 0)
+      ? 'Die Literangabe muss größer als 0 sein.'
+      : undefined;
   const amountError =
     amount && (amountCents === null || amountCents < 0) ? 'Der Betrag ist ungültig.' : undefined;
   const previewConsumption =
@@ -62,13 +64,7 @@ export default function NewFuelEntryScreen() {
       (!amount ? 'Bitte gib den bezahlten Betrag ein.' : null) ??
       amountError;
 
-    if (
-      firstError ||
-      !vehicleId ||
-      odometerKm === null ||
-      !litersValue ||
-      amountCents === null
-    ) {
+    if (firstError || !vehicleId || odometerKm === null || !litersValue || amountCents === null) {
       setFormError(firstError ?? 'Die Eingaben sind unvollständig.');
       return;
     }
@@ -105,9 +101,12 @@ export default function NewFuelEntryScreen() {
       onSecondaryPress={() => router.back()}
       primaryLabel="Tankvorgang speichern"
     >
-      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
+      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
         <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Tankvorgang</Text>
-        <Text style={[styles.infoText, { color: theme.colors.text }]}>Preis pro Liter und Verbrauch werden berechnet. Der bezahlte Betrag fließt automatisch in die Monatsübersicht ein.</Text>
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>
+          Preis pro Liter und Verbrauch werden berechnet. Der bezahlte Betrag fließt automatisch in
+          die Monatsübersicht ein.
+        </Text>
       </SurfaceCard>
 
       <DateField
@@ -153,10 +152,10 @@ export default function NewFuelEntryScreen() {
 
       {amountCents !== null && litersValue ? (
         <SurfaceCard style={styles.preview}>
-          <Text style={[styles.previewText, { color: theme.colors.text }]}> 
+          <Text style={[styles.previewText, { color: theme.colors.text }]}>
             Preis: {formatEuro(Math.round(amountCents / litersValue))} pro Liter
           </Text>
-          <Text style={[styles.previewText, { color: theme.colors.text }]}> 
+          <Text style={[styles.previewText, { color: theme.colors.text }]}>
             Verbrauch: {formatConsumption(previewConsumption)}
           </Text>
         </SurfaceCard>
@@ -174,14 +173,14 @@ export default function NewFuelEntryScreen() {
           },
         ]}
       >
-        <Text style={[styles.toggleText, { color: theme.colors.text }]}> 
+        <Text style={[styles.toggleText, { color: theme.colors.text }]}>
           {fullTank ? 'Vollgetankt' : 'Teilbetankung'}
         </Text>
       </Pressable>
       <FormField label="Notiz" maxLength={1000} multiline onChangeText={setNote} value={note} />
 
       {formError ? (
-        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}> 
+        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
           <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
         </View>
       ) : null}

@@ -70,7 +70,7 @@ export default function SignInScreen() {
               style={styles.logo}
             />
             <Text style={[styles.brandName, { color: theme.colors.text }]}>SpendFox</Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}> 
+            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
               Behalte Ausgaben, Produkte und Fahrzeuge clever im Blick – auf all deinen Geräten.
             </Text>
           </View>
@@ -79,8 +79,10 @@ export default function SignInScreen() {
             <Text style={[styles.title, { color: theme.colors.text }]}>Anmelden</Text>
 
             {setupError ? (
-              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}> 
-                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>{setupError}</Text>
+              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}>
+                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>
+                  {setupError}
+                </Text>
               </View>
             ) : null}
 
@@ -108,7 +110,7 @@ export default function SignInScreen() {
             />
 
             {error ? (
-              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}> 
+              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}>
                 <Text style={[styles.noticeText, { color: theme.colors.danger }]}>{error}</Text>
               </View>
             ) : null}

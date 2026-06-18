@@ -47,7 +47,10 @@ export function AppThemeProvider({ children }: PropsWithChildren) {
     await AsyncStorage.setItem(STORAGE_KEY, nextMode);
   }, []);
 
-  const value = useMemo<ThemeContextValue>(() => ({ theme, mode, setMode }), [mode, setMode, theme]);
+  const value = useMemo<ThemeContextValue>(
+    () => ({ theme, mode, setMode }),
+    [mode, setMode, theme],
+  );
 
   return createElement(ThemeContext.Provider, { value }, children);
 }

@@ -1,75 +1,76 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
-import { useColorScheme } from 'react-native';
+import {
+  createContext,
+  createElement,
+  type PropsWithChildren,
+  useCallback,
+  useColorScheme,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-export interface AppTheme {
-  dark: boolean;
-  colors: {
-    background: string;
-    surface: string;
-    surfaceMuted: string;
-    surfaceStrong: string;
-    text: string;
-    textMuted: string;
-    textSubtle: string;
-    primary: string;
-    primaryStrong: string;
-    primarySoft: string;
-    border: string;
-    danger: string;
-    dangerSoft: string;
-    success: string;
-    shadow: string;
-    white: string;
-  };
+import { darkTheme, lightTheme, type AppTheme } from '@/theme/tokens';
+
+export type ThemeMode = 'system' | 'light' | 'dark';
+
+interface ThemeContextValue {
+  theme: AppTheme;
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => Promise<void>;
 }
 
-const lightColors = {
-  background: 'whitesmoke',
-  surface: 'white',
-  surfaceMuted: 'honeydew',
-  surfaceStrong: 'gainsboro',
-  text: 'darkslategray',
-  textMuted: 'dimgray',
-  textSubtle: 'gray',
-  primary: 'seagreen',
-  primaryStrong: 'darkgreen',
-  primarySoft: 'honeydew',
-  border: 'lightgray',
-  danger: 'firebrick',
-  dangerSoft: 'mistyrose',
-  success: 'seagreen',
-  shadow: 'black',
-  white: 'white',
-};
+const STORAGE_KEY = 'spendfox.theme-mode';
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-export const lightTheme: AppTheme = { dark: false, colors: lightColors };
-export const darkTheme: AppTheme = {
-  dark: true,
-  colors: {
-    ...lightColors,
-    background: 'black',
-    surface: 'darkslategray',
-    surfaceMuted: 'slategray',
-    surfaceStrong: 'dimgray',
-    text: 'white',
-    textMuted: 'lightgray',
-    textSubtle: 'silver',
-    primary: 'mediumseagreen',
-    primaryStrong: 'darkgreen',
-    primarySoft: 'seagreen',
-    border: 'gray',
-    danger: 'lightcoral',
-    dangerSoft: 'maroon',
-    success: 'springgreen',
-  },
-};
+export { darkTheme, lightTheme, type AppTheme } from '@/theme/tokens';
+
+export function AppThemeProvider({ children }: PropsWithChildren) {
+  const systemScheme = useColorScheme();
+  const [mode, setModeState] = useState<ThemeMode>('system');
+
+  useEffect(() => {
+    void AsyncStorage.getItem(STORAGE_KEY).then((storedMode) => {
+      if (storedMode === 'system' || storedMode === 'light' || storedMode === 'dark') {
+        setModeState(storedMode);
+      }
+    });
+  }, []);
+
+  const resolvedMode = mode === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : mode;
+  const theme = resolvedMode === 'dark' ? darkTheme : lightTheme;
+
+  const setMode = useCallback(async (nextMode: ThemeMode) => {
+    setModeState(nextMode);
+    await AsyncStorage.setItem(STORAGE_KEY, nextMode);
+  }, []);
+
+  const value = useMemo<ThemeContextValue>(() => ({ theme, mode, setMode }), [mode, setMode, theme]);
+
+  return createElement(ThemeContext.Provider, { value }, children);
+}
 
 export function useAppTheme(): AppTheme {
-  return useColorScheme() === 'dark' ? darkTheme : lightTheme;
+  const context = useContext(ThemeContext);
+  const fallbackScheme = useColorScheme();
+  return context?.theme ?? (fallbackScheme === 'dark' ? darkTheme : lightTheme);
+}
+
+export function useThemePreference() {
+  const context = useContext(ThemeContext);
+
+  if (!context) {
+    throw new Error('Theme provider missing.');
+  }
+
+  return { mode: context.mode, setMode: context.setMode };
 }
 
 export function createNavigationTheme(appTheme: AppTheme): Theme {
   const base = appTheme.dark ? DarkTheme : DefaultTheme;
+
   return {
     ...base,
     dark: appTheme.dark,

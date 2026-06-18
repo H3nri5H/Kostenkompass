@@ -12,7 +12,13 @@ import { getVehicle, listVehicleFuelEntries, listVehicleParts } from '@/db/vehic
 import { formatDate } from '@/domain/dates';
 import type { Vehicle, VehicleFuelEntry, VehiclePart } from '@/domain/models';
 import { formatEuro } from '@/domain/money';
-import { formatConsumption, formatFuelPrice, formatLiters, getFuelTypeLabel, getPartStatusLabel } from '@/domain/vehicles';
+import {
+  formatConsumption,
+  formatFuelPrice,
+  formatLiters,
+  getFuelTypeLabel,
+  getPartStatusLabel,
+} from '@/domain/vehicles';
 import { useAppTheme } from '@/theme/theme';
 
 export default function CarDetailScreen() {
@@ -52,7 +58,7 @@ export default function CarDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}> 
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator color={theme.colors.primary} size="large" />
       </SafeAreaView>
     );
@@ -67,10 +73,15 @@ export default function CarDetailScreen() {
   }
 
   return (
-    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
+    <SafeAreaView
+      edges={['top']}
+      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView contentContainerStyle={styles.content}>
         <PageHeader
-          description={[vehicle.manufacturer, vehicle.model, getFuelTypeLabel(vehicle.fuelType)].filter(Boolean).join(' · ')}
+          description={[vehicle.manufacturer, vehicle.model, getFuelTypeLabel(vehicle.fuelType)]
+            .filter(Boolean)
+            .join(' · ')}
           title={vehicle.displayName}
         />
         <View style={styles.actions}>
@@ -97,14 +108,25 @@ export default function CarDetailScreen() {
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Tankvorgänge</Text>
         <SurfaceCard>
           {fuelEntries.length === 0 ? (
-            <EmptyState description="Noch keine Tankdaten erfasst." icon="car-outline" title="Leer" />
+            <EmptyState
+              description="Noch keine Tankdaten erfasst."
+              icon="car-outline"
+              title="Leer"
+            />
           ) : (
             <View style={styles.list}>
               {fuelEntries.slice(0, 8).map((entry) => (
                 <View key={entry.id} style={styles.entryRow}>
-                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}>{formatDate(entry.occurredOn)} · {entry.odometerKm.toLocaleString('de-DE')} km</Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>{formatLiters(entry.liters)} · {formatEuro(entry.totalCostCents)} · {formatFuelPrice(entry.pricePerLiterCents)}</Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>Verbrauch: {formatConsumption(entry.consumptionLitersPer100Km)}</Text>
+                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
+                    {formatDate(entry.occurredOn)} · {entry.odometerKm.toLocaleString('de-DE')} km
+                  </Text>
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
+                    {formatLiters(entry.liters)} · {formatEuro(entry.totalCostCents)} ·{' '}
+                    {formatFuelPrice(entry.pricePerLiterCents)}
+                  </Text>
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
+                    Verbrauch: {formatConsumption(entry.consumptionLitersPer100Km)}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -119,10 +141,18 @@ export default function CarDetailScreen() {
               {parts.slice(0, 10).map((part) => (
                 <View key={part.id} style={styles.partRow}>
                   <View style={styles.partCopy}>
-                    <Text style={[styles.entryTitle, { color: theme.colors.text }]}>{part.name}</Text>
-                    <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>{[part.manufacturer, part.partNumber, part.specification].filter(Boolean).join(' · ') || 'Keine Teilenummer'}</Text>
+                    <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
+                      {part.name}
+                    </Text>
+                    <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
+                      {[part.manufacturer, part.partNumber, part.specification]
+                        .filter(Boolean)
+                        .join(' · ') || 'Keine Teilenummer'}
+                    </Text>
                   </View>
-                  <Text style={[styles.partStatus, { color: theme.colors.primary }]}>{getPartStatusLabel(part.status)}</Text>
+                  <Text style={[styles.partStatus, { color: theme.colors.primary }]}>
+                    {getPartStatusLabel(part.status)}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -138,7 +168,9 @@ function Spec({ label, value }: { label: string; value: string | null }) {
   return (
     <View style={styles.specItem}>
       <Text style={[styles.specLabel, { color: theme.colors.textMuted }]}>{label}</Text>
-      <Text selectable style={[styles.specValue, { color: theme.colors.text }]}>{value || '—'}</Text>
+      <Text selectable style={[styles.specValue, { color: theme.colors.text }]}>
+        {value || '—'}
+      </Text>
     </View>
   );
 }
@@ -158,7 +190,12 @@ const styles = StyleSheet.create({
   entryRow: { gap: 3 },
   entryTitle: { fontSize: 15, fontWeight: '800' },
   entryMeta: { fontSize: 12, lineHeight: 17 },
-  partRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
+  partRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
   partCopy: { flex: 1, gap: 3 },
   partStatus: { fontSize: 12, fontWeight: '900' },
 });

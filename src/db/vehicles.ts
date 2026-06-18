@@ -234,8 +234,7 @@ export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
     );
     const openPartCount = parts.filter(
       (part) =>
-        part.vehicleId === vehicle.id &&
-        ['low_stock', 'needed', 'ordered'].includes(part.status),
+        part.vehicleId === vehicle.id && ['low_stock', 'needed', 'ordered'].includes(part.status),
     ).length;
 
     return {
@@ -251,10 +250,7 @@ export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
               (sum, entry) => sum + (entry.consumptionLitersPer100Km ?? 0),
               0,
             ) / entriesWithConsumption.length,
-      totalFuelCostCents: vehicleFuelEntries.reduce(
-        (sum, entry) => sum + entry.totalCostCents,
-        0,
-      ),
+      totalFuelCostCents: vehicleFuelEntries.reduce((sum, entry) => sum + entry.totalCostCents, 0),
       totalLiters: vehicleFuelEntries.reduce((sum, entry) => sum + entry.liters, 0),
       fuelEntryCount: vehicleFuelEntries.length,
       openPartCount,

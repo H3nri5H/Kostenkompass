@@ -2,7 +2,15 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/EmptyState';
@@ -102,7 +110,11 @@ export default function CarsScreen() {
                     {item.vehicle.displayName}
                   </Text>
                   <Text style={[styles.meta, { color: theme.colors.textMuted }]}>
-                    {[item.vehicle.manufacturer, item.vehicle.model, getFuelTypeLabel(item.vehicle.fuelType)]
+                    {[
+                      item.vehicle.manufacturer,
+                      item.vehicle.model,
+                      getFuelTypeLabel(item.vehicle.fuelType),
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </Text>
@@ -111,8 +123,14 @@ export default function CarsScreen() {
               </View>
 
               <View style={styles.metrics}>
-                <Metric label="Km-Stand" value={item.lastOdometerKm?.toLocaleString('de-DE') ?? '—'} />
-                <Metric label="Verbrauch" value={formatConsumption(item.averageConsumptionLitersPer100Km)} />
+                <Metric
+                  label="Km-Stand"
+                  value={item.lastOdometerKm?.toLocaleString('de-DE') ?? '—'}
+                />
+                <Metric
+                  label="Verbrauch"
+                  value={formatConsumption(item.averageConsumptionLitersPer100Km)}
+                />
                 <Metric label="Sprit" value={formatLiters(item.totalLiters)} />
               </View>
 
@@ -121,7 +139,9 @@ export default function CarsScreen() {
                   {item.fuelEntryCount} Tankvorgänge · {formatEuro(item.totalFuelCostCents)}
                 </Text>
                 {item.openPartCount > 0 ? (
-                  <Text style={[styles.partsBadge, { color: theme.colors.danger }]}>Teile: {item.openPartCount}</Text>
+                  <Text style={[styles.partsBadge, { color: theme.colors.danger }]}>
+                    Teile: {item.openPartCount}
+                  </Text>
                 ) : null}
               </View>
             </SurfaceCard>
@@ -150,7 +170,13 @@ const styles = StyleSheet.create({
   loading: { minHeight: 360, alignItems: 'center', justifyContent: 'center' },
   separator: { height: 12 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBox: { width: 46, height: 46, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  iconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   titleCopy: { flex: 1, gap: 3 },
   title: { fontSize: 18, fontWeight: '900' },
   meta: { fontSize: 12, lineHeight: 17 },
@@ -158,7 +184,14 @@ const styles = StyleSheet.create({
   metric: { flex: 1, borderRadius: 14, padding: 10, gap: 3 },
   metricLabel: { fontSize: 10, fontWeight: '800' },
   metricValue: { fontSize: 13, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  footer: { borderTopWidth: StyleSheet.hairlineWidth, marginTop: 14, paddingTop: 12, flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
+  footer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 14,
+    paddingTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
   footerText: { fontSize: 12, lineHeight: 17 },
   partsBadge: { fontSize: 12, fontWeight: '800' },
 });

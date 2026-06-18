@@ -2,7 +2,15 @@ import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppButton } from '@/components/AppButton';
@@ -91,16 +99,47 @@ export default function NewVehiclePartScreen() {
     >
       <SafeAreaView edges={['bottom']} style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
-            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Teil oder Verbrauchsmaterial</Text>
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>Hier landen Ölfilter, Luftfilter, Leuchtmittel, Scheibenwischer und ähnliche fahrzeugspezifische Daten aus der Excel-Datei.</Text>
+          <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
+            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>
+              Teil oder Verbrauchsmaterial
+            </Text>
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>
+              Hier landen Ölfilter, Luftfilter, Leuchtmittel, Scheibenwischer und ähnliche
+              fahrzeugspezifische Daten aus der Excel-Datei.
+            </Text>
           </SurfaceCard>
 
-          <FormField autoFocus label="Teilname" onChangeText={setName} placeholder="z. B. Ölfilter" value={name} />
-          <FormField label="Hersteller" onChangeText={setManufacturer} placeholder="z. B. Bosch" value={manufacturer} />
-          <FormField label="Teilenummer" onChangeText={setPartNumber} placeholder="z. B. F026407153" value={partNumber} />
-          <FormField label="Spezifikation" onChangeText={setSpecification} placeholder="z. B. R5502 Kohle" value={specification} />
-          <FormField label="Einbauort" onChangeText={setLocation} placeholder="z. B. Innenbeleuchtung hinten" value={location} />
+          <FormField
+            autoFocus
+            label="Teilname"
+            onChangeText={setName}
+            placeholder="z. B. Ölfilter"
+            value={name}
+          />
+          <FormField
+            label="Hersteller"
+            onChangeText={setManufacturer}
+            placeholder="z. B. Bosch"
+            value={manufacturer}
+          />
+          <FormField
+            label="Teilenummer"
+            onChangeText={setPartNumber}
+            placeholder="z. B. F026407153"
+            value={partNumber}
+          />
+          <FormField
+            label="Spezifikation"
+            onChangeText={setSpecification}
+            placeholder="z. B. R5502 Kohle"
+            value={specification}
+          />
+          <FormField
+            label="Einbauort"
+            onChangeText={setLocation}
+            placeholder="z. B. Innenbeleuchtung hinten"
+            value={location}
+          />
 
           <View style={styles.statusGroup}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Status</Text>
@@ -122,16 +161,43 @@ export default function NewVehiclePartScreen() {
                       },
                     ]}
                   >
-                    <Text style={{ color: selected ? theme.colors.primary : theme.colors.text, fontWeight: '700' }}>{getPartStatusLabel(option)}</Text>
+                    <Text
+                      style={{
+                        color: selected ? theme.colors.primary : theme.colors.text,
+                        fontWeight: '700',
+                      }}
+                    >
+                      {getPartStatusLabel(option)}
+                    </Text>
                   </Pressable>
                 );
               })}
             </View>
           </View>
 
-          <FormField inputMode="decimal" keyboardType="decimal-pad" label="Bestand" onChangeText={setQuantity} placeholder="Optional" value={quantity} />
-          <FormField inputMode="decimal" keyboardType="decimal-pad" label="Bestellgrenze" onChangeText={setThreshold} placeholder="Optional" value={threshold} />
-          <FormField label="Notiz" multiline onChangeText={setNote} placeholder="Optional" value={note} />
+          <FormField
+            inputMode="decimal"
+            keyboardType="decimal-pad"
+            label="Bestand"
+            onChangeText={setQuantity}
+            placeholder="Optional"
+            value={quantity}
+          />
+          <FormField
+            inputMode="decimal"
+            keyboardType="decimal-pad"
+            label="Bestellgrenze"
+            onChangeText={setThreshold}
+            placeholder="Optional"
+            value={threshold}
+          />
+          <FormField
+            label="Notiz"
+            multiline
+            onChangeText={setNote}
+            placeholder="Optional"
+            value={note}
+          />
 
           {formError ? (
             <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
@@ -141,7 +207,12 @@ export default function NewVehiclePartScreen() {
 
           <View style={styles.actions}>
             <AppButton label="Teil speichern" loading={saving} onPress={() => void save()} />
-            <AppButton disabled={saving} label="Abbrechen" onPress={() => router.back()} variant="ghost" />
+            <AppButton
+              disabled={saving}
+              label="Abbrechen"
+              onPress={() => router.back()}
+              variant="ghost"
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -2,7 +2,15 @@ import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppButton } from '@/components/AppButton';
@@ -83,7 +91,10 @@ export default function NewCarScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
             <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Auto-Stammdaten</Text>
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>Diese Angaben entsprechen den technischen Blöcken aus der Excel-Datei und können später in den Export einfließen.</Text>
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>
+              Diese Angaben entsprechen den technischen Blöcken aus der Excel-Datei und können
+              später in den Export einfließen.
+            </Text>
           </SurfaceCard>
 
           <FormField
@@ -93,8 +104,18 @@ export default function NewCarScreen() {
             placeholder="z. B. VW Polo 6RC1"
             value={displayName}
           />
-          <FormField label="Hersteller" onChangeText={setManufacturer} placeholder="VW" value={manufacturer} />
-          <FormField label="Modell" onChangeText={setModel} placeholder="Polo 1.4 TDI" value={model} />
+          <FormField
+            label="Hersteller"
+            onChangeText={setManufacturer}
+            placeholder="VW"
+            value={manufacturer}
+          />
+          <FormField
+            label="Modell"
+            onChangeText={setModel}
+            placeholder="Polo 1.4 TDI"
+            value={model}
+          />
 
           <View style={styles.group}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Kraftstoffart</Text>
@@ -116,18 +137,40 @@ export default function NewCarScreen() {
                       },
                     ]}
                   >
-                    <Text style={{ color: selected ? theme.colors.primary : theme.colors.text, fontWeight: '700' }}>{getFuelTypeLabel(type)}</Text>
+                    <Text
+                      style={{
+                        color: selected ? theme.colors.primary : theme.colors.text,
+                        fontWeight: '700',
+                      }}
+                    >
+                      {getFuelTypeLabel(type)}
+                    </Text>
                   </Pressable>
                 );
               })}
             </View>
           </View>
 
-          <FormField label="Kennzeichen" onChangeText={setLicensePlate} placeholder="Optional" value={licensePlate} />
+          <FormField
+            label="Kennzeichen"
+            onChangeText={setLicensePlate}
+            placeholder="Optional"
+            value={licensePlate}
+          />
           <FormField label="FIN / VIN" onChangeText={setVin} placeholder="Optional" value={vin} />
           <FormField label="KBA" onChangeText={setKba} placeholder="z. B. 0603 / BNV" value={kba} />
-          <FormField label="Motorcode" onChangeText={setEngineCode} placeholder="Optional" value={engineCode} />
-          <FormField label="Getriebecode" onChangeText={setTransmissionCode} placeholder="Optional" value={transmissionCode} />
+          <FormField
+            label="Motorcode"
+            onChangeText={setEngineCode}
+            placeholder="Optional"
+            value={engineCode}
+          />
+          <FormField
+            label="Getriebecode"
+            onChangeText={setTransmissionCode}
+            placeholder="Optional"
+            value={transmissionCode}
+          />
           <FormField
             inputMode="numeric"
             keyboardType="number-pad"
@@ -136,7 +179,13 @@ export default function NewCarScreen() {
             placeholder="Optional"
             value={year}
           />
-          <FormField label="Notizen" multiline onChangeText={setNotes} placeholder="Optional" value={notes} />
+          <FormField
+            label="Notizen"
+            multiline
+            onChangeText={setNotes}
+            placeholder="Optional"
+            value={notes}
+          />
 
           {formError ? (
             <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
@@ -146,7 +195,12 @@ export default function NewCarScreen() {
 
           <View style={styles.actions}>
             <AppButton label="Auto speichern" loading={saving} onPress={() => void save()} />
-            <AppButton disabled={saving} label="Abbrechen" onPress={() => router.back()} variant="ghost" />
+            <AppButton
+              disabled={saving}
+              label="Abbrechen"
+              onPress={() => router.back()}
+              variant="ghost"
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

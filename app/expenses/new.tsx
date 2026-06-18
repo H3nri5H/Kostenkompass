@@ -1,7 +1,6 @@
 import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -28,10 +27,8 @@ import { validateIsoDate, validatePositiveCents } from '@/domain/validation';
 import { useAppTheme } from '@/theme/theme';
 
 export default function NewExpenseScreen() {
-  const db = useSQLiteContext();
   const router = useRouter();
   const theme = useAppTheme();
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
@@ -45,12 +42,11 @@ export default function NewExpenseScreen() {
   useEffect(() => {
     let mounted = true;
 
-    void listCategories(db)
+    void listCategories()
       .then((result) => {
         if (!mounted) {
           return;
         }
-
         setCategories(result);
         setCategoryId(result[0]?.id ?? null);
       })
@@ -62,7 +58,7 @@ export default function NewExpenseScreen() {
     return () => {
       mounted = false;
     };
-  }, [db]);
+  }, []);
 
   const amountCents = useMemo(() => parseEuroToCents(amount), [amount]);
   const amountError = amount.length > 0 ? validatePositiveCents(amountCents, 'Der Betrag') : null;
@@ -83,7 +79,7 @@ export default function NewExpenseScreen() {
     setSaving(true);
 
     try {
-      await createExpense(db, {
+      await createExpense({
         id: Crypto.randomUUID(),
         categoryId,
         amountCents,
@@ -95,7 +91,7 @@ export default function NewExpenseScreen() {
       router.back();
     } catch (error) {
       console.error(error);
-      setFormError('Die Ausgabe konnte nicht gespeichert werden.');
+      setFormError('Die Ausgabe konnte nicht synchronisiert werden.');
     } finally {
       setSaving(false);
     }
@@ -118,12 +114,10 @@ export default function NewExpenseScreen() {
               },
             ]}
           >
-            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>
-              Tatsächliche Zahlung
-            </Text>
+            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Cloud-Zahlung</Text>
             <Text style={[styles.infoText, { color: theme.colors.text }]}>
-              Dieser Betrag fließt in den Cashflow. Rechnerische Produktkosten werden separat
-              erfasst.
+              Die Ausgabe wird deinem Konto zugeordnet und ist danach auf deinen anderen Geräten
+              verfügbar.
             </Text>
           </SurfaceCard>
 
@@ -152,11 +146,7 @@ export default function NewExpenseScreen() {
             value={merchant}
           />
 
-          <CategoryPicker
-            categories={categories}
-            onChange={setCategoryId}
-            selectedId={categoryId}
-          />
+          <CategoryPicker categories={categories} onChange={setCategoryId} selectedId={categoryId} />
 
           <DateField
             label="Datum"
@@ -196,48 +186,19 @@ export default function NewExpenseScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 18,
-    paddingBottom: 32,
-    gap: 18,
-  },
-  infoCard: {
-    gap: 6,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  infoText: {
-    fontSize: 13,
-    lineHeight: 19,
-  },
+  container: { flex: 1 },
+  content: { padding: 18, paddingBottom: 32, gap: 18 },
+  infoCard: { gap: 6 },
+  infoTitle: { fontSize: 14, fontWeight: '800' },
+  infoText: { fontSize: 13, lineHeight: 19 },
   amountInput: {
     minHeight: 66,
     fontSize: 27,
     fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
-  amountPreview: {
-    fontSize: 12,
-    fontWeight: '700',
-    marginTop: -11,
-    paddingHorizontal: 2,
-  },
-  errorBox: {
-    borderRadius: 14,
-    padding: 13,
-  },
-  errorText: {
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: '600',
-  },
-  actions: {
-    gap: 8,
-    marginTop: 2,
-  },
+  amountPreview: { fontSize: 12, fontWeight: '700', marginTop: -11, paddingHorizontal: 2 },
+  errorBox: { borderRadius: 14, padding: 13 },
+  errorText: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
+  actions: { gap: 8, marginTop: 2 },
 });

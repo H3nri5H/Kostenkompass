@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kostenkompass",
     "slug": "kostenkompass-mobile",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "scheme": "kostenkompass",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
     "web": {
       "output": "static"
     },
-    "plugins": ["expo-router", "expo-sqlite"],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     }

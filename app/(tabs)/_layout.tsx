@@ -8,18 +8,10 @@ import { useAppTheme } from '@/theme/theme';
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
 const icons: Record<string, { active: IconName; inactive: IconName }> = {
-  index: {
-    active: 'grid',
-    inactive: 'grid-outline',
-  },
-  expenses: {
-    active: 'receipt',
-    inactive: 'receipt-outline',
-  },
-  assets: {
-    active: 'cube',
-    inactive: 'cube-outline',
-  },
+  index: { active: 'grid', inactive: 'grid-outline' },
+  expenses: { active: 'receipt', inactive: 'receipt-outline' },
+  assets: { active: 'cube', inactive: 'cube-outline' },
+  account: { active: 'person-circle', inactive: 'person-circle-outline' },
 };
 
 export default function TabsLayout() {
@@ -55,6 +47,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: 'Übersicht' }} />
       <Tabs.Screen name="expenses" options={{ title: 'Ausgaben' }} />
       <Tabs.Screen name="assets" options={{ title: 'Produkte' }} />
+      <Tabs.Screen name="account" options={{ title: 'Konto' }} />
     </Tabs>
   );
 }

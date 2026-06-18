@@ -14,7 +14,7 @@ export function EmptyState({ icon, title, description }: EmptyStateProps) {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconContainer, { backgroundColor: theme.colors.primarySoft }] }>
+      <View style={[styles.iconContainer, { backgroundColor: theme.colors.primarySoft }]}>
         <Ionicons color={theme.colors.primary} name={icon} size={28} />
       </View>
       <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>

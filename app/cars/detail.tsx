@@ -1,17 +1,27 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppButton } from '@/components/AppButton';
 import { EmptyState } from '@/components/EmptyState';
+import { IconButton } from '@/components/IconButton';
 import { PageHeader } from '@/components/PageHeader';
 import { SurfaceCard } from '@/components/SurfaceCard';
 import { getVehicle, listVehicleFuelEntries, listVehicleParts } from '@/db/vehicles';
 import { formatDate } from '@/domain/dates';
 import type { Vehicle, VehicleFuelEntry, VehiclePart } from '@/domain/models';
 import { formatEuro } from '@/domain/money';
+import { formatKilometers, getInspectionState, getPartServiceState } from '@/domain/vehicle-due';
 import {
   formatConsumption,
   formatFuelPrice,
@@ -33,6 +43,7 @@ export default function CarDetailScreen() {
 
   const load = useCallback(async () => {
     if (!vehicleId) return;
+
     try {
       const [loadedVehicle, loadedFuelEntries, loadedParts] = await Promise.all([
         getVehicle(vehicleId),
@@ -58,7 +69,7 @@ export default function CarDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}> 
         <ActivityIndicator color={theme.colors.primary} size="large" />
       </SafeAreaView>
     );
@@ -66,11 +77,15 @@ export default function CarDetailScreen() {
 
   if (!vehicle || !vehicleId) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.colors.background }]}> 
         <Text style={{ color: theme.colors.text }}>Auto nicht gefunden.</Text>
       </SafeAreaView>
     );
   }
+
+  const currentOdometerKm =
+    fuelEntries.length === 0 ? null : Math.max(...fuelEntries.map((entry) => entry.odometerKm));
+  const inspectionState = getInspectionState(vehicle.nextInspectionOn);
 
   return (
     <SafeAreaView
@@ -79,11 +94,17 @@ export default function CarDetailScreen() {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <PageHeader
+          action={{
+            icon: 'create-outline',
+            label: 'Auto bearbeiten',
+            onPress: () => router.push({ pathname: '/cars/edit', params: { vehicleId } }),
+          }}
           description={[vehicle.manufacturer, vehicle.model, getFuelTypeLabel(vehicle.fuelType)]
             .filter(Boolean)
             .join(' · ')}
           title={vehicle.displayName}
         />
+
         <View style={styles.actions}>
           <AppButton
             label="Tankvorgang"
@@ -97,6 +118,7 @@ export default function CarDetailScreen() {
             variant="secondary"
           />
         </View>
+
         <SurfaceCard style={styles.specCard}>
           <Spec label="Kennzeichen" value={vehicle.licensePlate} />
           <Spec label="FIN" value={vehicle.vin} />
@@ -104,7 +126,17 @@ export default function CarDetailScreen() {
           <Spec label="Motor" value={vehicle.engineCode} />
           <Spec label="Getriebe" value={vehicle.transmissionCode} />
           <Spec label="Baujahr" value={vehicle.firstRegistrationYear?.toString() ?? null} />
+          <Spec
+            label="Letzte HU/AU"
+            value={vehicle.lastInspectionOn ? formatDate(vehicle.lastInspectionOn) : null}
+          />
+          <Spec
+            label="Nächste HU/AU"
+            value={vehicle.nextInspectionOn ? formatDate(vehicle.nextInspectionOn) : null}
+            state={inspectionState}
+          />
         </SurfaceCard>
+
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Tankvorgänge</Text>
         <SurfaceCard>
           {fuelEntries.length === 0 ? (
@@ -117,14 +149,14 @@ export default function CarDetailScreen() {
             <View style={styles.list}>
               {fuelEntries.slice(0, 8).map((entry) => (
                 <View key={entry.id} style={styles.entryRow}>
-                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
+                  <Text style={[styles.entryTitle, { color: theme.colors.text }]}> 
                     {formatDate(entry.occurredOn)} · {entry.odometerKm.toLocaleString('de-DE')} km
                   </Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
                     {formatLiters(entry.liters)} · {formatEuro(entry.totalCostCents)} ·{' '}
                     {formatFuelPrice(entry.pricePerLiterCents)}
                   </Text>
-                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
+                  <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
                     Verbrauch: {formatConsumption(entry.consumptionLitersPer100Km)}
                   </Text>
                 </View>
@@ -132,29 +164,65 @@ export default function CarDetailScreen() {
             </View>
           )}
         </SurfaceCard>
+
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Teile</Text>
         <SurfaceCard>
           {parts.length === 0 ? (
             <EmptyState description="Noch keine Teile erfasst." icon="cube-outline" title="Leer" />
           ) : (
             <View style={styles.list}>
-              {parts.slice(0, 10).map((part) => (
-                <View key={part.id} style={styles.partRow}>
-                  <View style={styles.partCopy}>
-                    <Text style={[styles.entryTitle, { color: theme.colors.text }]}>
-                      {part.name}
-                    </Text>
-                    <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}>
-                      {[part.manufacturer, part.partNumber, part.specification]
-                        .filter(Boolean)
-                        .join(' · ') || 'Keine Teilenummer'}
-                    </Text>
+              {parts.map((part) => {
+                const service = getPartServiceState(part, currentOdometerKm);
+                const serviceColor =
+                  service.state === 'due'
+                    ? theme.colors.danger
+                    : service.state === 'soon'
+                      ? theme.colors.warning
+                      : theme.colors.primary;
+
+                return (
+                  <View key={part.id} style={styles.partRow}>
+                    <View style={styles.partCopy}>
+                      <Text style={[styles.entryTitle, { color: theme.colors.text }]}>{part.name}</Text>
+                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                        {[part.manufacturer, part.partNumber, part.specification]
+                          .filter(Boolean)
+                          .join(' · ') || 'Keine Teilenummer'}
+                      </Text>
+                      {service.nextDueOdometerKm !== null ? (
+                        <Text style={[styles.serviceText, { color: serviceColor }]}> 
+                          Nächster Tausch bei {formatKilometers(service.nextDueOdometerKm)}
+                          {service.remainingKm !== null
+                            ? ` · ${service.remainingKm <= 0 ? 'fällig' : `${formatKilometers(service.remainingKm)} übrig`}`
+                            : ''}
+                        </Text>
+                      ) : null}
+                      <Text style={[styles.entryMeta, { color: theme.colors.textMuted }]}> 
+                        {getPartStatusLabel(part.status)}
+                      </Text>
+                    </View>
+                    <View style={styles.partActions}>
+                      {part.productUrl ? (
+                        <IconButton
+                          icon="open-outline"
+                          label="Produktseite öffnen"
+                          onPress={() => void Linking.openURL(part.productUrl!)}
+                        />
+                      ) : null}
+                      <IconButton
+                        icon="create-outline"
+                        label="Teil bearbeiten"
+                        onPress={() =>
+                          router.push({
+                            pathname: '/cars/parts/edit',
+                            params: { vehicleId, partId: part.id },
+                          })
+                        }
+                      />
+                    </View>
                   </View>
-                  <Text style={[styles.partStatus, { color: theme.colors.primary }]}>
-                    {getPartStatusLabel(part.status)}
-                  </Text>
-                </View>
-              ))}
+                );
+              })}
             </View>
           )}
         </SurfaceCard>
@@ -163,12 +231,27 @@ export default function CarDetailScreen() {
   );
 }
 
-function Spec({ label, value }: { label: string; value: string | null }) {
+function Spec({
+  label,
+  value,
+  state = 'ok',
+}: {
+  label: string;
+  value: string | null;
+  state?: 'not_configured' | 'ok' | 'soon' | 'due';
+}) {
   const theme = useAppTheme();
+  const valueColor =
+    state === 'due'
+      ? theme.colors.danger
+      : state === 'soon'
+        ? theme.colors.warning
+        : theme.colors.text;
+
   return (
     <View style={styles.specItem}>
       <Text style={[styles.specLabel, { color: theme.colors.textMuted }]}>{label}</Text>
-      <Text selectable style={[styles.specValue, { color: theme.colors.text }]}>
+      <Text selectable style={[styles.specValue, { color: valueColor }]}> 
         {value || '—'}
       </Text>
     </View>
@@ -186,16 +269,12 @@ const styles = StyleSheet.create({
   specLabel: { fontSize: 11, fontWeight: '800' },
   specValue: { fontSize: 14, fontWeight: '700' },
   sectionTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },
-  list: { gap: 14 },
+  list: { gap: 16 },
   entryRow: { gap: 3 },
   entryTitle: { fontSize: 15, fontWeight: '800' },
   entryMeta: { fontSize: 12, lineHeight: 17 },
-  partRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  partCopy: { flex: 1, gap: 3 },
-  partStatus: { fontSize: 12, fontWeight: '900' },
+  partRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  partCopy: { flex: 1, gap: 4 },
+  partActions: { gap: 8 },
+  serviceText: { fontSize: 12, fontWeight: '800', lineHeight: 17 },
 });

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="fur" x1="326" y1="250" x2="670" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF9A52"/><stop offset="0.52" stop-color="#F2762E"/><stop offset="1" stop-color="#D95F1F"/>
+    </linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%">
+      <feDropShadow dx="0" dy="26" stdDeviation="32" flood-color="#7A3517" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <circle cx="512" cy="542" r="313" fill="none" stroke="#D95F1F" stroke-width="88" stroke-linecap="round" stroke-dasharray="1540 427" transform="rotate(-58 512 542)"/>
+    <path d="M701.2 239.2 A357 357 0 0 1 843 408.3 L761.4 441.2 A269 269 0 0 0 654.5 313.9 Z" fill="#FFE0CA"/>
+    <circle cx="677.9" cy="276.6" r="44" fill="#FFE0CA"/>
+    <path d="M276 260 L414 337 C445 319 478 310 512 310 C546 310 579 319 610 337 L748 260 L721 486 C716 617 638 713 512 777 C386 713 308 617 303 486 Z" fill="url(#fur)"/>
+    <path d="M329 336 L397 374 C363 402 339 437 320 477 Z" fill="#FFF2E7" fill-opacity="0.92"/>
+    <path d="M695 336 L627 374 C661 402 685 437 704 477 Z" fill="#FFF2E7" fill-opacity="0.92"/>
+    <path d="M315 474 C358 524 416 554 489 571 C454 605 427 641 406 681 C347 638 318 572 315 474 Z" fill="#FFF2E7"/>
+    <path d="M709 474 C666 524 608 554 535 571 C570 605 597 641 618 681 C677 638 706 572 709 474 Z" fill="#FFF2E7"/>
+    <path d="M403 558 C431 527 471 527 512 557 C553 527 593 527 621 558 C639 596 615 651 512 710 C409 651 385 596 403 558 Z" fill="#FFF2E7"/>
+    <path d="M366 471 C390 451 422 452 445 471 C423 489 389 490 366 471 Z" fill="#241B17"/>
+    <path d="M658 471 C634 451 602 452 579 471 C601 489 635 490 658 471 Z" fill="#241B17"/>
+    <path d="M512 536 C536 536 552 552 552 575 C552 598 535 614 512 614 C489 614 472 598 472 575 C472 552 488 536 512 536 Z" fill="#241B17"/>
+    <path d="M490 634 Q512 648 534 634" fill="none" stroke="#241B17" stroke-width="11" stroke-linecap="round"/>
+  </g>
+</svg>

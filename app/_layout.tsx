@@ -5,19 +5,31 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { LoadingScreen } from '@/components/LoadingScreen';
-import { createNavigationTheme, useAppTheme } from '@/theme/theme';
+import {
+  AppThemeProvider,
+  createNavigationTheme,
+  useAppTheme,
+} from '@/theme/theme';
 
 export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <AppThemeProvider>
+        <ThemedRoot />
+      </AppThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function ThemedRoot() {
   const theme = useAppTheme();
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider value={createNavigationTheme(theme)}>
-        <AuthProvider>
-          <RootNavigator />
-        </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <ThemeProvider value={createNavigationTheme(theme)}>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -31,7 +43,7 @@ function RootNavigator() {
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={theme.dark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: theme.colors.background },
@@ -61,6 +73,7 @@ function RootNavigator() {
             options={{ presentation: 'modal', title: 'Auto erfassen' }}
           />
           <Stack.Screen name="cars/detail" options={{ title: 'Auto' }} />
+          <Stack.Screen name="cars/edit" options={{ title: 'Auto bearbeiten' }} />
           <Stack.Screen
             name="cars/fuel/new"
             options={{ presentation: 'modal', title: 'Tankvorgang' }}
@@ -69,6 +82,7 @@ function RootNavigator() {
             name="cars/parts/new"
             options={{ presentation: 'modal', title: 'Teil erfassen' }}
           />
+          <Stack.Screen name="cars/parts/edit" options={{ title: 'Teil bearbeiten' }} />
         </Stack.Protected>
       </Stack>
     </>

@@ -8,6 +8,7 @@
     "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
+    "web": "expo start --web",
     "lint": "expo lint --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "jest",
@@ -15,6 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "bundle:ios": "expo export --platform ios --output-dir dist/ios --no-minify --no-bytecode --max-workers 2",
+    "bundle:web": "expo export --platform web --output-dir dist/web --max-workers 2",
     "doctor": "expo-doctor",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm test -- --runInBand"
   },

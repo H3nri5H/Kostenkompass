@@ -2,20 +2,11 @@ import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { AppButton } from '@/components/AppButton';
 import { DateField } from '@/components/DateField';
 import { FormField } from '@/components/FormField';
+import { FormScreen } from '@/components/FormScreen';
 import { SurfaceCard } from '@/components/SurfaceCard';
 import { createVehicleFuelEntry } from '@/db/vehicles';
 import { todayIso } from '@/domain/dates';
@@ -47,33 +38,43 @@ export default function NewFuelEntryScreen() {
   );
   const litersValue = useMemo(() => parseDecimalInput(liters), [liters]);
   const amountCents = useMemo(() => parseEuroToCents(amount), [amount]);
+  const odometerError =
+    odometer && odometerKm === null ? 'Der Kilometerstand muss eine ganze Zahl sein.' : undefined;
+  const distanceError =
+    distance && distanceKm === null ? 'Die Strecke muss eine ganze Zahl sein.' : undefined;
+  const litersError =
+    liters && (!litersValue || litersValue <= 0) ? 'Die Literangabe muss größer als 0 sein.' : undefined;
+  const amountError =
+    amount && (amountCents === null || amountCents < 0) ? 'Der Betrag ist ungültig.' : undefined;
   const previewConsumption =
     litersValue && distanceKm && distanceKm > 0 ? (litersValue * 100) / distanceKm : null;
 
   async function save() {
     setFormError(null);
 
-    if (!vehicleId) {
-      setFormError('Das Auto fehlt. Bitte öffne den Tankvorgang aus einem Auto heraus.');
-      return;
-    }
+    const firstError =
+      (!vehicleId ? 'Das Auto fehlt.' : null) ??
+      (!odometer ? 'Bitte gib den aktuellen Kilometerstand ein.' : null) ??
+      odometerError ??
+      distanceError ??
+      (!liters ? 'Bitte gib die getankten Liter ein.' : null) ??
+      litersError ??
+      (!amount ? 'Bitte gib den bezahlten Betrag ein.' : null) ??
+      amountError;
 
-    if (odometerKm === null) {
-      setFormError('Bitte gib den aktuellen Kilometerstand ein.');
-      return;
-    }
-
-    if (!litersValue || litersValue <= 0) {
-      setFormError('Bitte gib die getankten Liter ein.');
-      return;
-    }
-
-    if (amountCents === null || amountCents < 0) {
-      setFormError('Bitte gib den bezahlten Betrag ein.');
+    if (
+      firstError ||
+      !vehicleId ||
+      odometerKm === null ||
+      !litersValue ||
+      amountCents === null
+    ) {
+      setFormError(firstError ?? 'Die Eingaben sind unvollständig.');
       return;
     }
 
     setSaving(true);
+
     try {
       await createVehicleFuelEntry({
         id: Crypto.randomUUID(),
@@ -98,121 +99,97 @@ export default function NewFuelEntryScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={[styles.flex, { backgroundColor: theme.colors.background }]}
+    <FormScreen
+      loading={saving}
+      onPrimaryPress={() => void save()}
+      onSecondaryPress={() => router.back()}
+      primaryLabel="Tankvorgang speichern"
     >
-      <SafeAreaView edges={['bottom']} style={styles.flex}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
-            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Tankvorgang</Text>
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>
-              Die App berechnet Preis pro Liter und Verbrauch automatisch, sobald Strecke und Liter
-              vorhanden sind.
-            </Text>
-          </SurfaceCard>
+      <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}> 
+        <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Tankvorgang</Text>
+        <Text style={[styles.infoText, { color: theme.colors.text }]}>Preis pro Liter und Verbrauch werden berechnet. Der bezahlte Betrag fließt automatisch in die Monatsübersicht ein.</Text>
+      </SurfaceCard>
 
-          <DateField
-            label="Datum"
-            onChange={setOccurredOn}
-            onOpenChange={setDatePickerOpen}
-            open={datePickerOpen}
-            value={occurredOn}
-          />
-          <FormField
-            inputMode="numeric"
-            keyboardType="number-pad"
-            label="Kilometerstand"
-            onChangeText={setOdometer}
-            placeholder="z. B. 137200"
-            value={odometer}
-          />
-          <FormField
-            inputMode="numeric"
-            keyboardType="number-pad"
-            label="Gefahrene Kilometer"
-            onChangeText={setDistance}
-            placeholder="Optional, z. B. 819"
-            value={distance}
-          />
-          <FormField
-            inputMode="decimal"
-            keyboardType="decimal-pad"
-            label="Getankte Liter"
-            onChangeText={setLiters}
-            placeholder="z. B. 42,51"
-            value={liters}
-          />
-          <FormField
-            inputMode="decimal"
-            keyboardType="decimal-pad"
-            label="Betrag"
-            onChangeText={setAmount}
-            placeholder="z. B. 65,42"
-            value={amount}
-          />
+      <DateField
+        label="Datum"
+        onChange={setOccurredOn}
+        onOpenChange={setDatePickerOpen}
+        open={datePickerOpen}
+        value={occurredOn}
+      />
+      <FormField
+        error={odometerError}
+        inputMode="numeric"
+        keyboardType="number-pad"
+        label="Kilometerstand"
+        onChangeText={setOdometer}
+        value={odometer}
+      />
+      <FormField
+        error={distanceError}
+        hint="Strecke seit dem letzten relevanten Tankvorgang."
+        inputMode="numeric"
+        keyboardType="number-pad"
+        label="Gefahrene Kilometer"
+        onChangeText={setDistance}
+        value={distance}
+      />
+      <FormField
+        error={litersError}
+        inputMode="decimal"
+        keyboardType="decimal-pad"
+        label="Getankte Liter"
+        onChangeText={setLiters}
+        value={liters}
+      />
+      <FormField
+        error={amountError}
+        inputMode="decimal"
+        keyboardType="decimal-pad"
+        label="Betrag"
+        onChangeText={setAmount}
+        value={amount}
+      />
 
-          {amountCents !== null && litersValue ? (
-            <SurfaceCard style={styles.preview}>
-              <Text style={[styles.previewText, { color: theme.colors.text }]}>
-                Preis: {formatEuro(Math.round(amountCents / litersValue))} pro Liter
-              </Text>
-              <Text style={[styles.previewText, { color: theme.colors.text }]}>
-                Verbrauch: {formatConsumption(previewConsumption)}
-              </Text>
-            </SurfaceCard>
-          ) : null}
+      {amountCents !== null && litersValue ? (
+        <SurfaceCard style={styles.preview}>
+          <Text style={[styles.previewText, { color: theme.colors.text }]}> 
+            Preis: {formatEuro(Math.round(amountCents / litersValue))} pro Liter
+          </Text>
+          <Text style={[styles.previewText, { color: theme.colors.text }]}> 
+            Verbrauch: {formatConsumption(previewConsumption)}
+          </Text>
+        </SurfaceCard>
+      ) : null}
 
-          <FormField
-            label="Tankstelle"
-            onChangeText={setStation}
-            placeholder="Optional"
-            value={station}
-          />
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => setFullTank((current) => !current)}
-            style={[
-              styles.toggle,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-            ]}
-          >
-            <Text style={[styles.toggleText, { color: theme.colors.text }]}>
-              {fullTank ? 'Vollgetankt' : 'Teilbetankung'}
-            </Text>
-          </Pressable>
-          <FormField
-            label="Notiz"
-            multiline
-            onChangeText={setNote}
-            placeholder="Optional"
-            value={note}
-          />
+      <FormField label="Tankstelle" maxLength={160} onChangeText={setStation} value={station} />
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setFullTank((current) => !current)}
+        style={[
+          styles.toggle,
+          {
+            backgroundColor: fullTank ? theme.colors.primarySoft : theme.colors.surface,
+            borderColor: fullTank ? theme.colors.primary : theme.colors.border,
+          },
+        ]}
+      >
+        <Text style={[styles.toggleText, { color: theme.colors.text }]}> 
+          {fullTank ? 'Vollgetankt' : 'Teilbetankung'}
+        </Text>
+      </Pressable>
+      <FormField label="Notiz" maxLength={1000} multiline onChangeText={setNote} value={note} />
 
-          {formError ? (
-            <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}>
-              <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
-            </View>
-          ) : null}
-
-          <View style={styles.actions}>
-            <AppButton label="Speichern" loading={saving} onPress={() => void save()} />
-            <AppButton
-              disabled={saving}
-              label="Abbrechen"
-              onPress={() => router.back()}
-              variant="ghost"
-            />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      {formError ? (
+        <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSoft }]}> 
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>{formError}</Text>
+        </View>
+      ) : null}
+    </FormScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  content: { padding: 18, paddingBottom: 34, gap: 18 },
   infoCard: { gap: 6 },
   infoTitle: { fontSize: 14, fontWeight: '800' },
   infoText: { fontSize: 13, lineHeight: 19 },
@@ -228,5 +205,4 @@ const styles = StyleSheet.create({
   toggleText: { fontSize: 15, fontWeight: '700' },
   errorBox: { borderRadius: 14, padding: 13 },
   errorText: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
-  actions: { gap: 8, marginTop: 2 },
 });

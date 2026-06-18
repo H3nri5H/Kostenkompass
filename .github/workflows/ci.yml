@@ -17,7 +17,7 @@ jobs:
   quality:
     name: Quality checks
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -46,3 +46,6 @@ jobs:
 
       - name: Build iOS JavaScript bundle
         run: npm run bundle:ios
+
+      - name: Build web application
+        run: npm run bundle:web

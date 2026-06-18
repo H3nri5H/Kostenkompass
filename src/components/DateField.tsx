@@ -12,11 +12,24 @@ interface DateFieldProps {
   onChange: (value: string) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  maximumDate?: Date | null;
+  minimumDate?: Date;
+  optional?: boolean;
 }
 
-export function DateField({ label, value, onChange, open, onOpenChange }: DateFieldProps) {
+export function DateField({
+  label,
+  value,
+  onChange,
+  open,
+  onOpenChange,
+  maximumDate,
+  minimumDate,
+  optional = false,
+}: DateFieldProps) {
   const theme = useAppTheme();
   const date = parseIsoDate(value) ?? new Date();
+  const effectiveMaximumDate = maximumDate === undefined ? new Date() : maximumDate ?? undefined;
 
   function handleChange(event: DateTimePickerEvent, selectedDate?: Date) {
     if (Platform.OS === 'android') {
@@ -44,7 +57,9 @@ export function DateField({ label, value, onChange, open, onOpenChange }: DateFi
         ]}
       >
         <Ionicons color={theme.colors.primary} name="calendar-outline" size={20} />
-        <Text style={[styles.value, { color: theme.colors.text }]}>{formatDate(value)}</Text>
+        <Text style={[styles.value, { color: value ? theme.colors.text : theme.colors.textSubtle }]}>
+          {value ? formatDate(value) : 'Nicht gesetzt'}
+        </Text>
         <Ionicons
           color={theme.colors.textMuted}
           name={open ? 'chevron-up' : 'chevron-down'}
@@ -65,7 +80,8 @@ export function DateField({ label, value, onChange, open, onOpenChange }: DateFi
           <DateTimePicker
             accentColor={theme.colors.primary}
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
-            maximumDate={new Date()}
+            maximumDate={effectiveMaximumDate}
+            minimumDate={minimumDate}
             mode="date"
             onChange={handleChange}
             themeVariant={theme.dark ? 'dark' : 'light'}
@@ -76,6 +92,16 @@ export function DateField({ label, value, onChange, open, onOpenChange }: DateFi
               label="Datum übernehmen"
               onPress={() => onOpenChange(false)}
               variant="secondary"
+            />
+          ) : null}
+          {optional && value ? (
+            <AppButton
+              label="Datum entfernen"
+              onPress={() => {
+                onChange('');
+                onOpenChange(false);
+              }}
+              variant="ghost"
             />
           ) : null}
         </View>

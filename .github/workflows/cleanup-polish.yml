@@ -1,0 +1,65 @@
+name: Clean up SpendFox polish automation
+
+on:
+  push:
+    branches:
+      - polish
+    paths:
+      - .github/workflows/cleanup-polish.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout polish branch
+        uses: actions/checkout@v4
+        with:
+          ref: polish
+          fetch-depth: 0
+
+      - name: Wait for finalized and verified branch
+        shell: bash
+        run: |
+          for attempt in $(seq 1 48); do
+            git pull --rebase origin polish
+            if test -f assets/icon.png \
+              && test -f assets/adaptive-icon.png \
+              && test -f assets/spendfox-mark.png \
+              && test -f assets/favicon.png \
+              && test -f verification/status.txt \
+              && grep -qx '0 0 0 0 0 0' verification/status.txt \
+              && grep -q '"name": "spendfox-mobile"' package.json; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "The branch was not fully verified in time."
+          exit 1
+
+      - name: Remove one-time automation and diagnostics
+        shell: bash
+        run: |
+          rm -rf verification
+          rm -f \
+            .github/workflows/generate-brand-assets.yml \
+            .github/workflows/finalize-polish.yml \
+            .github/workflows/finalize-polish-v2.yml \
+            .github/workflows/fix-branding-test.yml \
+            .github/workflows/fix-package-metadata.yml \
+            .github/workflows/commit-brand-assets.yml \
+            .github/workflows/verify-polish.yml \
+            .github/workflows/cleanup-polish.yml
+
+      - name: Commit clean final branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: remove temporary polish automation"
+          git push origin polish

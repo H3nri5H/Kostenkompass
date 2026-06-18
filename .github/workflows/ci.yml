@@ -9,10 +9,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   quality:
     name: Quality checks
@@ -32,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Format parse check
-        run: npm run format
+      - name: Check formatting
+        run: npm run format:check
 
       - name: Lint
         run: npm run lint
@@ -42,10 +38,10 @@ jobs:
         run: npm run typecheck
 
       - name: Unit tests
-        run: npm test -- --runInBand --coverage
+        run: npm test -- --runInBand
 
-      - name: Build iOS JavaScript bundle
+      - name: Build iOS bundle
         run: npm run bundle:ios
 
-      - name: Build web application
+      - name: Build web bundle
         run: npm run bundle:web

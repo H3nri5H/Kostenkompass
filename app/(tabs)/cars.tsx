@@ -17,8 +17,10 @@ import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/PageHeader';
 import { SurfaceCard } from '@/components/SurfaceCard';
 import { listVehicleSummaries } from '@/db/vehicles';
+import { formatDate } from '@/domain/dates';
 import type { VehicleSummary } from '@/domain/models';
 import { formatEuro } from '@/domain/money';
+import { getInspectionState } from '@/domain/vehicle-due';
 import { formatConsumption, formatLiters, getFuelTypeLabel } from '@/domain/vehicles';
 import { useAppTheme } from '@/theme/theme';
 
@@ -85,68 +87,91 @@ export default function CarsScreen() {
                 label: 'Auto erfassen',
                 onPress: () => router.push('/cars/new'),
               }}
-              description="Tankvorgänge, technische Daten und Teilelisten je Fahrzeug."
+              description="Tankvorgänge, HU/AU, technische Daten und Teile je Fahrzeug."
               title="Autos"
             />
           </View>
         }
         onRefresh={() => void refresh()}
         refreshing={refreshing}
-        renderItem={({ item }) => (
-          <Pressable
-            accessibilityRole="button"
-            onPress={() =>
-              router.push({ pathname: '/cars/detail', params: { vehicleId: item.vehicle.id } })
-            }
-            style={({ pressed }) => [{ opacity: pressed ? 0.72 : 1 }]}
-          >
-            <SurfaceCard>
-              <View style={styles.cardHeader}>
-                <View style={[styles.iconBox, { backgroundColor: theme.colors.primarySoft }]}>
-                  <Ionicons color={theme.colors.primary} name="car-outline" size={24} />
-                </View>
-                <View style={styles.titleCopy}>
-                  <Text style={[styles.title, { color: theme.colors.text }]}>
-                    {item.vehicle.displayName}
-                  </Text>
-                  <Text style={[styles.meta, { color: theme.colors.textMuted }]}>
-                    {[
-                      item.vehicle.manufacturer,
-                      item.vehicle.model,
-                      getFuelTypeLabel(item.vehicle.fuelType),
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </Text>
-                </View>
-                <Ionicons color={theme.colors.textMuted} name="chevron-forward" size={20} />
-              </View>
+        renderItem={({ item }) => {
+          const inspectionState = getInspectionState(item.vehicle.nextInspectionOn);
+          const alertCount = item.openPartCount + item.dueServicePartCount;
 
-              <View style={styles.metrics}>
-                <Metric
-                  label="Km-Stand"
-                  value={item.lastOdometerKm?.toLocaleString('de-DE') ?? '—'}
-                />
-                <Metric
-                  label="Verbrauch"
-                  value={formatConsumption(item.averageConsumptionLitersPer100Km)}
-                />
-                <Metric label="Sprit" value={formatLiters(item.totalLiters)} />
-              </View>
+          return (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() =>
+                router.push({ pathname: '/cars/detail', params: { vehicleId: item.vehicle.id } })
+              }
+              style={({ pressed }) => [{ opacity: pressed ? 0.72 : 1 }]}
+            >
+              <SurfaceCard>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.iconBox, { backgroundColor: theme.colors.primarySoft }]}> 
+                    <Ionicons color={theme.colors.primary} name="car-outline" size={24} />
+                  </View>
+                  <View style={styles.titleCopy}>
+                    <Text style={[styles.title, { color: theme.colors.text }]}> 
+                      {item.vehicle.displayName}
+                    </Text>
+                    <Text style={[styles.meta, { color: theme.colors.textMuted }]}> 
+                      {[
+                        item.vehicle.manufacturer,
+                        item.vehicle.model,
+                        getFuelTypeLabel(item.vehicle.fuelType),
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </Text>
+                  </View>
+                  <Ionicons color={theme.colors.textMuted} name="chevron-forward" size={20} />
+                </View>
 
-              <View style={[styles.footer, { borderTopColor: theme.colors.border }]}>
-                <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
-                  {item.fuelEntryCount} Tankvorgänge · {formatEuro(item.totalFuelCostCents)}
-                </Text>
-                {item.openPartCount > 0 ? (
-                  <Text style={[styles.partsBadge, { color: theme.colors.danger }]}>
-                    Teile: {item.openPartCount}
+                <View style={styles.metrics}>
+                  <Metric
+                    label="Km-Stand"
+                    value={item.lastOdometerKm?.toLocaleString('de-DE') ?? '—'}
+                  />
+                  <Metric
+                    label="Verbrauch"
+                    value={formatConsumption(item.averageConsumptionLitersPer100Km)}
+                  />
+                  <Metric label="Sprit" value={formatLiters(item.totalLiters)} />
+                </View>
+
+                {item.vehicle.nextInspectionOn ? (
+                  <Text
+                    style={[
+                      styles.inspection,
+                      {
+                        color:
+                          inspectionState === 'due'
+                            ? theme.colors.danger
+                            : inspectionState === 'soon'
+                              ? theme.colors.warning
+                              : theme.colors.textMuted,
+                      },
+                    ]}
+                  >
+                    Nächste HU/AU: {formatDate(item.vehicle.nextInspectionOn)}
                   </Text>
                 ) : null}
-              </View>
-            </SurfaceCard>
-          </Pressable>
-        )}
+
+                <View style={[styles.footer, { borderTopColor: theme.colors.border }]}> 
+                  <Text style={[styles.footerText, { color: theme.colors.textMuted }]}> 
+                    {item.fuelEntryCount} Tankvorgänge · {formatEuro(item.totalFuelCostCents)}
+                  </Text>
+                  {alertCount > 0 ? (
+                    <Text style={[styles.partsBadge, { color: theme.colors.danger }]}> 
+                      Hinweise: {alertCount}
+                    </Text>
+                  ) : null}
+                </View>
+              </SurfaceCard>
+            </Pressable>
+          );
+        }}
       />
     </SafeAreaView>
   );
@@ -156,7 +181,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   const theme = useAppTheme();
 
   return (
-    <View style={[styles.metric, { backgroundColor: theme.colors.surfaceMuted }]}>
+    <View style={[styles.metric, { backgroundColor: theme.colors.surfaceMuted }]}> 
       <Text style={[styles.metricLabel, { color: theme.colors.textMuted }]}>{label}</Text>
       <Text style={[styles.metricValue, { color: theme.colors.text }]}>{value}</Text>
     </View>
@@ -184,6 +209,7 @@ const styles = StyleSheet.create({
   metric: { flex: 1, borderRadius: 14, padding: 10, gap: 3 },
   metricLabel: { fontSize: 10, fontWeight: '800' },
   metricValue: { fontSize: 13, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  inspection: { fontSize: 12, fontWeight: '800', marginTop: 12 },
   footer: {
     borderTopWidth: StyleSheet.hairlineWidth,
     marginTop: 14,

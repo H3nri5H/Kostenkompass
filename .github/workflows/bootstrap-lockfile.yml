@@ -3,7 +3,7 @@ name: Bootstrap dependency lockfile
 on:
   push:
     branches:
-      - feat/offline-mvp
+      - offline-mvp
 
 permissions:
   contents: write

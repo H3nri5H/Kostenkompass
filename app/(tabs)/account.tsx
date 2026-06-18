@@ -8,6 +8,7 @@ import { useAuth } from '@/auth/AuthProvider';
 import { AppButton } from '@/components/AppButton';
 import { PageHeader } from '@/components/PageHeader';
 import { SurfaceCard } from '@/components/SurfaceCard';
+import { ThemeModeSelector } from '@/components/ThemeModeSelector';
 import { useAppTheme } from '@/theme/theme';
 
 export default function AccountScreen() {
@@ -34,25 +35,33 @@ export default function AccountScreen() {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <PageHeader
-          description="Dieses Konto verbindet deine Kosten über alle angemeldeten Geräte."
+          description="Dieses Konto verbindet deine SpendFox-Daten über alle angemeldeten Geräte."
           title="Konto"
         />
 
         <SurfaceCard style={styles.profileCard}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primarySoft }]}>
+          <View style={[styles.avatar, { backgroundColor: theme.colors.primarySoft }]}> 
             <Ionicons color={theme.colors.primary} name="person-outline" size={28} />
           </View>
           <View style={styles.profileCopy}>
             <Text style={[styles.label, { color: theme.colors.textMuted }]}>Angemeldet als</Text>
-            <Text selectable style={[styles.email, { color: theme.colors.text }]}>
+            <Text selectable style={[styles.email, { color: theme.colors.text }]}> 
               {user?.email ?? 'Unbekanntes Konto'}
             </Text>
           </View>
         </SurfaceCard>
 
+        <SurfaceCard style={styles.infoCard}>
+          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>Darstellung</Text>
+          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}> 
+            Hell und Dunkel können unabhängig von der Systemeinstellung gewählt werden.
+          </Text>
+          <ThemeModeSelector />
+        </SurfaceCard>
+
         <SurfaceCard style={styles.statusCard}>
           <StatusRow
-            description="Ausgaben und Produkte liegen in der Cloud-Datenbank."
+            description="Ausgaben, Produkte und Autos liegen in der Cloud-Datenbank."
             icon="cloud-done-outline"
             title="Geräteübergreifend gespeichert"
           />
@@ -66,7 +75,7 @@ export default function AccountScreen() {
 
         <SurfaceCard style={styles.infoCard}>
           <Text style={[styles.infoTitle, { color: theme.colors.text }]}>Abmelden</Text>
-          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}>
+          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}> 
             Die Daten bleiben im Konto erhalten. Du kannst dich anschließend auf diesem oder einem
             anderen Gerät erneut anmelden.
           </Text>
@@ -98,7 +107,7 @@ function StatusRow({
       <Ionicons color={theme.colors.primary} name={icon} size={23} />
       <View style={styles.statusCopy}>
         <Text style={[styles.statusTitle, { color: theme.colors.text }]}>{title}</Text>
-        <Text style={[styles.statusDescription, { color: theme.colors.textMuted }]}>
+        <Text style={[styles.statusDescription, { color: theme.colors.textMuted }]}> 
           {description}
         </Text>
       </View>

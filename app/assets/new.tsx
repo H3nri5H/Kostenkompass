@@ -1,7 +1,6 @@
 import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -34,10 +33,8 @@ import {
 import { useAppTheme } from '@/theme/theme';
 
 export default function NewAssetScreen() {
-  const db = useSQLiteContext();
   const router = useRouter();
   const theme = useAppTheme();
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -55,12 +52,9 @@ export default function NewAssetScreen() {
   useEffect(() => {
     let mounted = true;
 
-    void listCategories(db)
+    void listCategories()
       .then((result) => {
-        if (!mounted) {
-          return;
-        }
-
+        if (!mounted) return;
         setCategories(result);
         const technology = result.find((category) => category.id === 'technik');
         setCategoryId(technology?.id ?? result[0]?.id ?? null);
@@ -73,7 +67,7 @@ export default function NewAssetScreen() {
     return () => {
       mounted = false;
     };
-  }, [db]);
+  }, []);
 
   const purchasePriceCents = useMemo(() => parseEuroToCents(purchasePrice), [purchasePrice]);
   const residualValueCents = useMemo(() => parseEuroToCents(residualValue), [residualValue]);
@@ -133,7 +127,7 @@ export default function NewAssetScreen() {
     setSaving(true);
 
     try {
-      await createAsset(db, {
+      await createAsset({
         id: Crypto.randomUUID(),
         categoryId,
         name,
@@ -149,7 +143,7 @@ export default function NewAssetScreen() {
       router.back();
     } catch (error) {
       console.error(error);
-      setFormError('Das Produkt konnte nicht gespeichert werden.');
+      setFormError('Das Produkt konnte nicht synchronisiert werden.');
     } finally {
       setSaving(false);
     }
@@ -163,21 +157,11 @@ export default function NewAssetScreen() {
     >
       <SafeAreaView edges={['bottom']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <SurfaceCard
-            style={[
-              styles.infoCard,
-              {
-                backgroundColor: theme.colors.primarySoft,
-                borderColor: theme.colors.primarySoft,
-              },
-            ]}
-          >
-            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>
-              Produktkosten statt Doppelzählung
-            </Text>
+          <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
+            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Synchronisiertes Produkt</Text>
             <Text style={[styles.infoText, { color: theme.colors.text }]}>
-              Ein Produkt erzeugt keine automatische Ausgabe. Erfasse den Kauf zusätzlich unter
-              „Ausgaben“, wenn er im Cashflow erscheinen soll.
+              Das Produkt wird deinem Konto zugeordnet. Die Kaufzahlung bleibt weiterhin eine
+              separate Ausgabe.
             </Text>
           </SurfaceCard>
 
@@ -189,29 +173,20 @@ export default function NewAssetScreen() {
             placeholder="z. B. MacBook Air"
             value={name}
           />
-
-          <View style={styles.fieldGroup}>
-            <FormField
-              autoCapitalize="words"
-              label="Hersteller"
-              onChangeText={setManufacturer}
-              placeholder="Optional"
-              value={manufacturer}
-            />
-            <FormField
-              label="Modell"
-              onChangeText={setModel}
-              placeholder="Optional"
-              value={model}
-            />
-          </View>
-
-          <CategoryPicker
-            categories={categories}
-            onChange={setCategoryId}
-            selectedId={categoryId}
+          <FormField
+            autoCapitalize="words"
+            label="Hersteller"
+            onChangeText={setManufacturer}
+            placeholder="Optional"
+            value={manufacturer}
           />
-
+          <FormField
+            label="Modell"
+            onChangeText={setModel}
+            placeholder="Optional"
+            value={model}
+          />
+          <CategoryPicker categories={categories} onChange={setCategoryId} selectedId={categoryId} />
           <DateField
             label="Kaufdatum"
             onChange={setPurchasedOn}
@@ -219,7 +194,6 @@ export default function NewAssetScreen() {
             open={datePickerOpen}
             value={purchasedOn}
           />
-
           <FormField
             inputMode="decimal"
             keyboardType="decimal-pad"
@@ -228,7 +202,6 @@ export default function NewAssetScreen() {
             placeholder="0,00 €"
             value={purchasePrice}
           />
-
           <FormField
             hint="Erwarteter Wert am Ende der geplanten Nutzung."
             inputMode="decimal"
@@ -238,7 +211,6 @@ export default function NewAssetScreen() {
             placeholder="0,00 €"
             value={residualValue}
           />
-
           <FormField
             hint="Private wirtschaftliche Nutzung, keine steuerliche AfA."
             inputMode="numeric"
@@ -251,13 +223,7 @@ export default function NewAssetScreen() {
 
           {preview ? (
             <SurfaceCard
-              style={[
-                styles.preview,
-                {
-                  backgroundColor: theme.colors.primaryStrong,
-                  borderColor: theme.colors.primaryStrong,
-                },
-              ]}
+              style={[styles.preview, { backgroundColor: theme.colors.primaryStrong }]}
             >
               <Text style={styles.previewLabel}>Vorschau</Text>
               <Text style={styles.previewAmount}>
@@ -298,31 +264,12 @@ export default function NewAssetScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 18,
-    paddingBottom: 32,
-    gap: 18,
-  },
-  infoCard: {
-    gap: 6,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  infoText: {
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  fieldGroup: {
-    gap: 18,
-  },
-  preview: {
-    gap: 5,
-  },
+  container: { flex: 1 },
+  content: { padding: 18, paddingBottom: 32, gap: 18 },
+  infoCard: { gap: 6 },
+  infoTitle: { fontSize: 14, fontWeight: '800' },
+  infoText: { fontSize: 13, lineHeight: 19 },
+  preview: { gap: 5, borderColor: 'transparent' },
   previewLabel: {
     color: '#D1E6DA',
     fontSize: 11,
@@ -336,25 +283,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontVariant: ['tabular-nums'],
   },
-  previewSuffix: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  previewMeta: {
-    color: '#D1E6DA',
-    fontSize: 12,
-  },
-  errorBox: {
-    borderRadius: 14,
-    padding: 13,
-  },
-  errorText: {
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: '600',
-  },
-  actions: {
-    gap: 8,
-    marginTop: 2,
-  },
+  previewSuffix: { fontSize: 13, fontWeight: '700' },
+  previewMeta: { color: '#D1E6DA', fontSize: 12 },
+  errorBox: { borderRadius: 14, padding: 13 },
+  errorText: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
+  actions: { gap: 8, marginTop: 2 },
 });

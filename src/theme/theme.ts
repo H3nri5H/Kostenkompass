@@ -5,12 +5,12 @@ import {
   createElement,
   type PropsWithChildren,
   useCallback,
-  useColorScheme,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react';
+import { useColorScheme } from 'react-native';
 
 import { darkTheme, lightTheme, type AppTheme } from '@/theme/tokens';
 

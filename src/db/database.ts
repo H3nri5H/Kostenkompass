@@ -1,8 +1,11 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+interface LegacySQLiteDatabase {
+  execAsync: (query: string) => Promise<void>;
+  getFirstAsync: <T>(query: string) => Promise<T | null>;
+}
 
 const DATABASE_VERSION = 1;
 
-export async function migrateDatabase(db: SQLiteDatabase): Promise<void> {
+export async function migrateDatabase(db: LegacySQLiteDatabase): Promise<void> {
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
@@ -57,14 +60,10 @@ export async function migrateDatabase(db: SQLiteDatabase): Promise<void> {
         CHECK (residual_value_cents <= purchase_price_cents)
       );
 
-      CREATE INDEX IF NOT EXISTS idx_expenses_occurred_on
-        ON expenses(occurred_on DESC);
-      CREATE INDEX IF NOT EXISTS idx_expenses_category
-        ON expenses(category_id);
-      CREATE INDEX IF NOT EXISTS idx_assets_purchased_on
-        ON assets(purchased_on DESC);
-      CREATE INDEX IF NOT EXISTS idx_assets_category
-        ON assets(category_id);
+      CREATE INDEX IF NOT EXISTS idx_expenses_occurred_on ON expenses(occurred_on DESC);
+      CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category_id);
+      CREATE INDEX IF NOT EXISTS idx_assets_purchased_on ON assets(purchased_on DESC);
+      CREATE INDEX IF NOT EXISTS idx_assets_category ON assets(category_id);
 
       INSERT OR IGNORE INTO categories (id, name, icon, color, sort_order) VALUES
         ('wohnen', 'Wohnen', 'home-outline', '#6B6ED6', 10),

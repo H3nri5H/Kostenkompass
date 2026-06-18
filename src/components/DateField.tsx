@@ -29,7 +29,11 @@ export function DateField({
 }: DateFieldProps) {
   const theme = useAppTheme();
   const date = parseIsoDate(value) ?? new Date();
-  const effectiveMaximumDate = maximumDate === undefined ? new Date() : (maximumDate ?? undefined);
+  const effectiveMaximumDate = maximumDate === undefined ? new Date() : maximumDate;
+  const dateBounds = {
+    ...(effectiveMaximumDate ? { maximumDate: effectiveMaximumDate } : {}),
+    ...(minimumDate ? { minimumDate } : {}),
+  };
 
   function handleChange(event: DateTimePickerEvent, selectedDate?: Date) {
     if (Platform.OS === 'android') {
@@ -80,10 +84,9 @@ export function DateField({
           ]}
         >
           <DateTimePicker
+            {...dateBounds}
             accentColor={theme.colors.primary}
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
-            maximumDate={effectiveMaximumDate}
-            minimumDate={minimumDate}
             mode="date"
             onChange={handleChange}
             themeVariant={theme.dark ? 'dark' : 'light'}

@@ -1,27 +1,32 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
-
 import type { Category, CategoryIconName } from '@/domain/models';
+import { supabase } from '@/lib/supabase';
 
 interface CategoryRow {
   id: string;
   name: string;
-  icon: CategoryIconName;
+  icon: string;
   color: string;
   sort_order: number;
 }
 
-export async function listCategories(db: SQLiteDatabase): Promise<Category[]> {
-  const rows = await db.getAllAsync<CategoryRow>(
-    `SELECT id, name, icon, color, sort_order
-     FROM categories
-     ORDER BY sort_order ASC, name ASC`,
-  );
+export async function listCategories(): Promise<Category[]> {
+  const response = await supabase
+    .from('categories')
+    .select('id, name, icon, color, sort_order')
+    .order('sort_order', { ascending: true })
+    .order('name', { ascending: true });
+
+  if (response.error) {
+    throw response.error;
+  }
+
+  const rows = (response.data ?? []) as CategoryRow[];
 
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
-    icon: row.icon,
+    icon: row.icon as CategoryIconName,
     color: row.color,
-    sortOrder: row.sort_order,
+    sortOrder: Number(row.sort_order),
   }));
 }

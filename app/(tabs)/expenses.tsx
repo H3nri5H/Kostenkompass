@@ -114,13 +114,17 @@ export default function ExpensesScreen() {
             {expenses.length > 0 ? (
               <View style={[styles.summary, { backgroundColor: theme.colors.primarySoft }]}>
                 <View>
-                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>Anzahl</Text>
+                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>
+                    Anzahl
+                  </Text>
                   <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
                     {expenses.length}
                   </Text>
                 </View>
                 <View style={styles.summaryRight}>
-                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>Summe</Text>
+                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>
+                    Summe
+                  </Text>
                   <Text style={[styles.summaryAmount, { color: theme.colors.primary }]}>
                     {formatEuro(total)}
                   </Text>

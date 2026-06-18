@@ -146,7 +146,11 @@ export default function NewExpenseScreen() {
             value={merchant}
           />
 
-          <CategoryPicker categories={categories} onChange={setCategoryId} selectedId={categoryId} />
+          <CategoryPicker
+            categories={categories}
+            onChange={setCategoryId}
+            selectedId={categoryId}
+          />
 
           <DateField
             label="Datum"

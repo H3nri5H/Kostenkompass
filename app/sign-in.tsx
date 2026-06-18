@@ -1,14 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAuthErrorMessage } from '@/auth/auth-errors';
@@ -61,10 +54,7 @@ export default function SignInScreen() {
       style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <SafeAreaView style={styles.flex}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.brand}>
             <View style={[styles.logo, { backgroundColor: theme.colors.primary }]}>
               <Ionicons
@@ -84,7 +74,9 @@ export default function SignInScreen() {
 
             {setupError ? (
               <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}>
-                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>{setupError}</Text>
+                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>
+                  {setupError}
+                </Text>
               </View>
             ) : null}
 

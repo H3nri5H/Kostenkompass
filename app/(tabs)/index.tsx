@@ -90,13 +90,14 @@ export default function DashboardScreen() {
           </View>
         ) : (
           <>
-            <SurfaceCard
-              style={[styles.hero, { backgroundColor: theme.colors.primaryStrong }]}
-            >
+            <SurfaceCard style={[styles.hero, { backgroundColor: theme.colors.primaryStrong }]}>
               <Text style={styles.heroLabel}>Ausgaben in diesem Monat</Text>
               <Text style={styles.heroAmount}>{formatEuro(summary.monthExpenseCents)}</Text>
               <View style={styles.metrics}>
-                <Metric label="Produkte / Monat" value={formatEuro(summary.monthlyAssetCostCents)} />
+                <Metric
+                  label="Produkte / Monat"
+                  value={formatEuro(summary.monthlyAssetCostCents)}
+                />
                 <Metric label="Produktwert" value={formatEuro(summary.activeAssetValueCents)} />
               </View>
             </SurfaceCard>

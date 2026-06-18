@@ -158,7 +158,9 @@ export default function NewAssetScreen() {
       <SafeAreaView edges={['bottom']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <SurfaceCard style={[styles.infoCard, { backgroundColor: theme.colors.primarySoft }]}>
-            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>Synchronisiertes Produkt</Text>
+            <Text style={[styles.infoTitle, { color: theme.colors.primary }]}>
+              Synchronisiertes Produkt
+            </Text>
             <Text style={[styles.infoText, { color: theme.colors.text }]}>
               Das Produkt wird deinem Konto zugeordnet. Die Kaufzahlung bleibt weiterhin eine
               separate Ausgabe.
@@ -180,13 +182,12 @@ export default function NewAssetScreen() {
             placeholder="Optional"
             value={manufacturer}
           />
-          <FormField
-            label="Modell"
-            onChangeText={setModel}
-            placeholder="Optional"
-            value={model}
+          <FormField label="Modell" onChangeText={setModel} placeholder="Optional" value={model} />
+          <CategoryPicker
+            categories={categories}
+            onChange={setCategoryId}
+            selectedId={categoryId}
           />
-          <CategoryPicker categories={categories} onChange={setCategoryId} selectedId={categoryId} />
           <DateField
             label="Kaufdatum"
             onChange={setPurchasedOn}
@@ -222,9 +223,7 @@ export default function NewAssetScreen() {
           />
 
           {preview ? (
-            <SurfaceCard
-              style={[styles.preview, { backgroundColor: theme.colors.primaryStrong }]}
-            >
+            <SurfaceCard style={[styles.preview, { backgroundColor: theme.colors.primaryStrong }]}>
               <Text style={styles.previewLabel}>Vorschau</Text>
               <Text style={styles.previewAmount}>
                 {formatEuro(preview.monthlyCostCents)}

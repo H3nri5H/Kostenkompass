@@ -115,13 +115,17 @@ export default function AssetsScreen() {
             {assets.length > 0 ? (
               <View style={[styles.summary, { backgroundColor: theme.colors.primarySoft }]}>
                 <View>
-                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>Produkte</Text>
+                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>
+                    Produkte
+                  </Text>
                   <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
                     {assets.length}
                   </Text>
                 </View>
                 <View style={styles.summaryRight}>
-                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>Pro Monat</Text>
+                  <Text style={[styles.summaryLabel, { color: theme.colors.textMuted }]}>
+                    Pro Monat
+                  </Text>
                   <Text style={[styles.summaryAmount, { color: theme.colors.primary }]}>
                     {formatEuro(monthlyCost)}
                   </Text>

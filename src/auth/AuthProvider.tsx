@@ -1,11 +1,14 @@
 import type { Session, User } from '@supabase/supabase-js';
-import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
-
 import {
-  isSupabaseConfigured,
-  requireSupabaseConfiguration,
-  supabase,
-} from '@/lib/supabase';
+  createContext,
+  type PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+import { isSupabaseConfigured, requireSupabaseConfiguration, supabase } from '@/lib/supabase';
 
 interface SignUpResult {
   requiresEmailConfirmation: boolean;

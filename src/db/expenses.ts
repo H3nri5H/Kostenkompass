@@ -85,10 +85,7 @@ export async function listExpenses(limit = 250): Promise<Expense[]> {
   return ((response.data ?? []) as unknown as ExpenseRow[]).map(mapExpense);
 }
 
-export async function listExpensesInRange(
-  start: string,
-  endExclusive: string,
-): Promise<Expense[]> {
+export async function listExpensesInRange(start: string, endExclusive: string): Promise<Expense[]> {
   const userId = await getAuthenticatedUserId();
   const response = await supabase
     .from('expenses')

@@ -1,7 +1,5 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppButton } from '@/components/AppButton';
-import { CategoryIcon } from '@/components/CategoryIcon';
 import { EmptyState } from '@/components/EmptyState';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { PageHeader } from '@/components/PageHeader';
@@ -37,7 +34,6 @@ const EMPTY_SUMMARY: DashboardSummary = {
 };
 
 export default function DashboardScreen() {
-  const db = useSQLiteContext();
   const router = useRouter();
   const theme = useAppTheme();
   const [summary, setSummary] = useState(EMPTY_SUMMARY);
@@ -46,14 +42,14 @@ export default function DashboardScreen() {
 
   const load = useCallback(async () => {
     try {
-      setSummary(await getDashboardSummary(db));
+      setSummary(await getDashboardSummary());
     } catch (error) {
       console.error(error);
       Alert.alert('Fehler', 'Die Übersicht konnte nicht geladen werden.');
     } finally {
       setLoading(false);
     }
-  }, [db]);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -61,14 +57,11 @@ export default function DashboardScreen() {
     }, [load]),
   );
 
-  const refresh = useCallback(async () => {
+  async function refresh() {
     setRefreshing(true);
     await load();
     setRefreshing(false);
-  }, [load]);
-
-  const heroBackground = theme.dark ? '#184B38' : theme.colors.primaryStrong;
-  const heroMuted = '#D1E6DA';
+  }
 
   return (
     <SafeAreaView
@@ -86,7 +79,7 @@ export default function DashboardScreen() {
         }
       >
         <PageHeader
-          description="Zahlungen und langfristige Produktkosten bleiben bewusst getrennt."
+          description="Deine synchronisierten Kosten auf allen Geräten."
           eyebrow={summary.monthLabel || 'Aktueller Monat'}
           title="Übersicht"
         />
@@ -98,43 +91,13 @@ export default function DashboardScreen() {
         ) : (
           <>
             <SurfaceCard
-              style={[
-                styles.hero,
-                {
-                  backgroundColor: heroBackground,
-                  borderColor: heroBackground,
-                },
-              ]}
+              style={[styles.hero, { backgroundColor: theme.colors.primaryStrong }]}
             >
-              <Text style={[styles.heroLabel, { color: heroMuted }]}>Ausgaben in diesem Monat</Text>
+              <Text style={styles.heroLabel}>Ausgaben in diesem Monat</Text>
               <Text style={styles.heroAmount}>{formatEuro(summary.monthExpenseCents)}</Text>
-
-              <View style={styles.heroDivider} />
-
-              <View style={styles.heroMetrics}>
-                <View style={styles.heroMetric}>
-                  <View style={styles.heroMetricLabel}>
-                    <Ionicons color={heroMuted} name="time-outline" size={16} />
-                    <Text style={[styles.heroMetricTitle, { color: heroMuted }]}>
-                      Produkte / Monat
-                    </Text>
-                  </View>
-                  <Text style={styles.heroMetricValue}>
-                    {formatEuro(summary.monthlyAssetCostCents)}
-                  </Text>
-                </View>
-
-                <View style={styles.heroMetric}>
-                  <View style={styles.heroMetricLabel}>
-                    <Ionicons color={heroMuted} name="wallet-outline" size={16} />
-                    <Text style={[styles.heroMetricTitle, { color: heroMuted }]}>
-                      Rechnerischer Wert
-                    </Text>
-                  </View>
-                  <Text style={styles.heroMetricValue}>
-                    {formatEuro(summary.activeAssetValueCents)}
-                  </Text>
-                </View>
+              <View style={styles.metrics}>
+                <Metric label="Produkte / Monat" value={formatEuro(summary.monthlyAssetCostCents)} />
+                <Metric label="Produktwert" value={formatEuro(summary.activeAssetValueCents)} />
               </View>
             </SurfaceCard>
 
@@ -154,44 +117,32 @@ export default function DashboardScreen() {
               />
             </View>
 
-            <SectionHeader
-              description="Tatsächliche Zahlungen im aktuellen Kalendermonat"
-              title="Nach Kategorie"
-            />
-
+            <SectionHeader title="Nach Kategorie" />
             <SurfaceCard>
               {summary.categoryTotals.length === 0 ? (
                 <EmptyState
-                  description="Sobald du eine Zahlung erfasst, erscheint hier die Verteilung."
+                  description="Erfasse eine Zahlung, um die Verteilung zu sehen."
                   icon="pie-chart-outline"
                   title="Noch keine Monatsausgaben"
                 />
               ) : (
-                <View style={styles.categoryList}>
+                <View style={styles.list}>
                   {summary.categoryTotals.map((category) => {
-                    const share =
+                    const progress =
                       summary.monthExpenseCents > 0
                         ? category.amountCents / summary.monthExpenseCents
                         : 0;
-
                     return (
-                      <View key={category.categoryId} style={styles.categoryRow}>
-                        <CategoryIcon
-                          color={category.categoryColor}
-                          icon={category.categoryIcon}
-                          size="small"
-                        />
-                        <View style={styles.categoryCopy}>
-                          <View style={styles.categoryHeader}>
-                            <Text style={[styles.categoryName, { color: theme.colors.text }]}>
-                              {category.categoryName}
-                            </Text>
-                            <Text style={[styles.categoryAmount, { color: theme.colors.text }]}>
-                              {formatEuro(category.amountCents)}
-                            </Text>
-                          </View>
-                          <ProgressBar color={category.categoryColor} progress={share} />
+                      <View key={category.categoryId} style={styles.category}>
+                        <View style={styles.row}>
+                          <Text style={[styles.name, { color: theme.colors.text }]}>
+                            {category.categoryName}
+                          </Text>
+                          <Text style={[styles.amount, { color: theme.colors.text }]}>
+                            {formatEuro(category.amountCents)}
+                          </Text>
                         </View>
+                        <ProgressBar color={category.categoryColor} progress={progress} />
                       </View>
                     );
                   })}
@@ -200,27 +151,17 @@ export default function DashboardScreen() {
             </SurfaceCard>
 
             <SectionHeader title="Zuletzt erfasst" />
-
             <SurfaceCard>
               {summary.recentExpenses.length === 0 ? (
                 <EmptyState
-                  description="Deine neuesten Zahlungen werden hier angezeigt."
+                  description="Neue Zahlungen erscheinen hier."
                   icon="receipt-outline"
                   title="Keine Ausgaben vorhanden"
                 />
               ) : (
-                <View>
-                  {summary.recentExpenses.map((expense, index) => (
-                    <View
-                      key={expense.id}
-                      style={[
-                        index > 0 && styles.recentDivider,
-                        index > 0 && { borderTopColor: theme.colors.border },
-                        index > 0 && styles.recentPadding,
-                      ]}
-                    >
-                      <ExpenseRow compact expense={expense} />
-                    </View>
+                <View style={styles.list}>
+                  {summary.recentExpenses.map((expense) => (
+                    <ExpenseRow compact expense={expense} key={expense.id} />
                   ))}
                 </View>
               )}
@@ -232,103 +173,36 @@ export default function DashboardScreen() {
   );
 }
 
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.metric}>
+      <Text style={styles.metricLabel}>{label}</Text>
+      <Text style={styles.metricValue}>{value}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: 36,
-    gap: 20,
-  },
-  loading: {
-    minHeight: 360,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hero: {
-    padding: 21,
-    gap: 7,
-  },
-  heroLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  safeArea: { flex: 1 },
+  content: { padding: 18, paddingBottom: 36, gap: 20 },
+  loading: { minHeight: 360, alignItems: 'center', justifyContent: 'center' },
+  hero: { gap: 8, borderColor: 'transparent' },
+  heroLabel: { color: '#D1E6DA', fontSize: 13, fontWeight: '700' },
   heroAmount: {
     color: '#FFFFFF',
     fontSize: 38,
-    lineHeight: 45,
     fontWeight: '900',
-    letterSpacing: -1.2,
     fontVariant: ['tabular-nums'],
   },
-  heroDivider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#FFFFFF40',
-    marginVertical: 12,
-  },
-  heroMetrics: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  heroMetric: {
-    flex: 1,
-    gap: 7,
-  },
-  heroMetricLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  heroMetricTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  heroMetricValue: {
-    color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: '800',
-    fontVariant: ['tabular-nums'],
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 11,
-  },
-  action: {
-    flex: 1,
-  },
-  categoryList: {
-    gap: 17,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  categoryCopy: {
-    flex: 1,
-    gap: 8,
-  },
-  categoryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  categoryName: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  categoryAmount: {
-    fontSize: 14,
-    fontWeight: '800',
-    fontVariant: ['tabular-nums'],
-  },
-  recentDivider: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  recentPadding: {
-    paddingTop: 14,
-    marginTop: 14,
-  },
+  metrics: { flexDirection: 'row', gap: 12, marginTop: 12 },
+  metric: { flex: 1, gap: 4 },
+  metricLabel: { color: '#D1E6DA', fontSize: 11, fontWeight: '700' },
+  metricValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
+  actions: { flexDirection: 'row', gap: 10 },
+  action: { flex: 1 },
+  list: { gap: 16 },
+  category: { gap: 8 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
+  name: { fontSize: 14, fontWeight: '700' },
+  amount: { fontSize: 14, fontWeight: '800', fontVariant: ['tabular-nums'] },
 });

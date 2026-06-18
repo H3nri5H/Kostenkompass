@@ -59,8 +59,8 @@ export function getFuelTypeLabel(type: VehicleFuelType): string {
 
 export function getPartStatusLabel(status: VehiclePartStatus): string {
   const labels: Record<VehiclePartStatus, string> = {
-    ok: 'Kein Handlungsbedarf',
-    low_stock: 'Bald benötigt',
+    ok: 'Vorhanden',
+    low_stock: 'Bestand niedrig',
     needed: 'Benötigt',
     ordered: 'Bestellt',
     installed: 'Verbaut',

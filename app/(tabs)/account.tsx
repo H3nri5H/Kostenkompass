@@ -8,7 +8,6 @@ import { useAuth } from '@/auth/AuthProvider';
 import { AppButton } from '@/components/AppButton';
 import { PageHeader } from '@/components/PageHeader';
 import { SurfaceCard } from '@/components/SurfaceCard';
-import { ThemeModeSelector } from '@/components/ThemeModeSelector';
 import { useAppTheme } from '@/theme/theme';
 
 export default function AccountScreen() {
@@ -35,7 +34,7 @@ export default function AccountScreen() {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <PageHeader
-          description="Dieses Konto verbindet deine SpendFox-Daten über alle angemeldeten Geräte."
+          description="Dieses Konto verbindet deine Kosten über alle angemeldeten Geräte."
           title="Konto"
         />
 
@@ -51,17 +50,9 @@ export default function AccountScreen() {
           </View>
         </SurfaceCard>
 
-        <SurfaceCard style={styles.infoCard}>
-          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>Darstellung</Text>
-          <Text style={[styles.infoText, { color: theme.colors.textMuted }]}>
-            Hell und Dunkel können unabhängig von der Systemeinstellung gewählt werden.
-          </Text>
-          <ThemeModeSelector />
-        </SurfaceCard>
-
         <SurfaceCard style={styles.statusCard}>
           <StatusRow
-            description="Ausgaben, Produkte und Autos liegen in der Cloud-Datenbank."
+            description="Ausgaben und Produkte liegen in der Cloud-Datenbank."
             icon="cloud-done-outline"
             title="Geräteübergreifend gespeichert"
           />

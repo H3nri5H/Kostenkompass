@@ -9,7 +9,7 @@ export function LoadingScreen() {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ActivityIndicator color={theme.colors.primary} size="large" />
       <Text style={[styles.label, { color: theme.colors.textMuted }]}>
-        SpendFox wird vorbereitet …
+        Kostenkompass wird vorbereitet …
       </Text>
     </View>
   );

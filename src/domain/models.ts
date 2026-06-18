@@ -100,13 +100,12 @@ export interface Vehicle {
   engineCode: string | null;
   transmissionCode: string | null;
   firstRegistrationYear: number | null;
-  lastInspectionOn: string | null;
-  nextInspectionOn: string | null;
   notes: string | null;
   createdAt: string;
 }
 
-export interface VehicleInput {
+export interface CreateVehicleInput {
+  id: string;
   displayName: string;
   manufacturer: string | null;
   model: string | null;
@@ -117,13 +116,7 @@ export interface VehicleInput {
   engineCode: string | null;
   transmissionCode: string | null;
   firstRegistrationYear: number | null;
-  lastInspectionOn: string | null;
-  nextInspectionOn: string | null;
   notes: string | null;
-}
-
-export interface CreateVehicleInput extends VehicleInput {
-  id: string;
 }
 
 export interface VehicleFuelEntry {
@@ -165,30 +158,25 @@ export interface VehiclePart {
   partNumber: string | null;
   specification: string | null;
   location: string | null;
-  productUrl: string | null;
-  lastReplacedOdometerKm: number | null;
-  replacementIntervalKm: number | null;
+  quantityOnHand: number | null;
+  reorderThreshold: number | null;
   status: VehiclePartStatus;
   note: string | null;
   createdAt: string;
 }
 
-export interface VehiclePartInput {
+export interface CreateVehiclePartInput {
+  id: string;
   vehicleId: string;
   name: string;
   manufacturer: string | null;
   partNumber: string | null;
   specification: string | null;
   location: string | null;
-  productUrl: string | null;
-  lastReplacedOdometerKm: number | null;
-  replacementIntervalKm: number | null;
+  quantityOnHand: number | null;
+  reorderThreshold: number | null;
   status: VehiclePartStatus;
   note: string | null;
-}
-
-export interface CreateVehiclePartInput extends VehiclePartInput {
-  id: string;
 }
 
 export interface VehicleSummary {
@@ -199,5 +187,4 @@ export interface VehicleSummary {
   totalLiters: number;
   fuelEntryCount: number;
   openPartCount: number;
-  dueServicePartCount: number;
 }

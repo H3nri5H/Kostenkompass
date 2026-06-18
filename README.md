@@ -1,6 +1,6 @@
-# SpendFox
+# Kostenkompass
 
-SpendFox ist eine Expo-/React-Native-App zur geräteübergreifenden Verwaltung persönlicher Ausgaben, langlebiger Anschaffungen und Fahrzeugdaten. Anmeldung und Cloud-Datenbank werden über Supabase bereitgestellt.
+Kostenkompass ist eine Expo-/React-Native-App zur geräteübergreifenden Verwaltung persönlicher Ausgaben, langlebiger Produkte und Fahrzeugdaten. Anmeldung und Datenspeicherung werden über Supabase bereitgestellt.
 
 ## Voraussetzungen
 
@@ -8,11 +8,11 @@ SpendFox ist eine Expo-/React-Native-App zur geräteübergreifenden Verwaltung p
 - Node.js 22 LTS mit npm
 - Visual Studio Code
 - ein kostenloses Supabase-Konto
-- Expo Go für kostenlose Tests auf einem echten iPhone oder Android-Gerät
+- Expo Go für Tests auf einem echten Mobilgerät
 
 Docker ist nicht erforderlich.
 
-## Projekt installieren
+## Installation
 
 ```powershell
 git clone https://github.com/H3nri5H/Kostenkompass.git
@@ -20,7 +20,7 @@ cd Kostenkompass
 npm ci
 ```
 
-Bei einem bereits vorhandenen Projektordner:
+Bei einem vorhandenen Projektordner:
 
 ```powershell
 git switch main
@@ -30,17 +30,14 @@ npm ci
 
 ## Supabase einrichten
 
-Erstelle in Supabase ein kostenloses Projekt und führe im **SQL Editor** diese Migrationen in der angegebenen Reihenfolge aus:
+Erstelle ein Supabase-Projekt und führe im SQL Editor diese Migrationen in der angegebenen Reihenfolge aus:
 
 ```text
 supabase/migrations/20260618153000_auth_sync.sql
 supabase/migrations/20260618172000_vehicle_logbook.sql
-supabase/migrations/20260618190000_vehicle_service_fields.sql
 ```
 
-Die Migrationen erstellen Benutzerkonten-Anbindung, Kategorien, Ausgaben, Produkte, Fahrzeuge, Tankvorgänge, Teilespezifikationen sowie die Row-Level-Security-Regeln. Jeder angemeldete Benutzer darf ausschließlich seine eigenen Datensätze lesen und verändern.
-
-Wurde das Projekt bereits mit den ersten beiden Migrationen eingerichtet, muss nur noch `20260618190000_vehicle_service_fields.sql` ausgeführt werden.
+Die Migrationen erstellen Benutzerkonten-Anbindung, Kategorien, Ausgaben, Produkte, Fahrzeuge, Tankvorgänge, Teilelisten und die Row-Level-Security-Regeln. Jeder angemeldete Benutzer darf ausschließlich seine eigenen Datensätze lesen und verändern.
 
 ## Lokale Konfiguration
 
@@ -55,7 +52,7 @@ EXPO_PUBLIC_SUPABASE_URL=https://DEIN-PROJEKT.supabase.co
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=DEIN_PUBLISHABLE_KEY
 ```
 
-Verwende ausschließlich den öffentlichen **Publishable Key** beziehungsweise den öffentlichen `anon`-Key. Ein `service_role`- oder Secret-Key darf niemals in die App oder in GitHub gelangen. Nach Änderungen an `.env` muss der Expo-Server neu gestartet werden.
+Verwende ausschließlich den öffentlichen Publishable Key beziehungsweise den öffentlichen `anon`-Key. Ein `service_role`- oder Secret-Key darf niemals in die App oder in GitHub gelangen. Nach Änderungen an `.env` muss der Expo-Server neu gestartet werden.
 
 ## Auf einem echten Mobilgerät starten
 
@@ -113,7 +110,7 @@ npm run android
 
 ## Konto und Synchronisation testen
 
-Beim ersten Start erscheint die SpendFox-Anmeldung. Über **Registrieren** wird ein Konto mit E-Mail-Adresse und Passwort erstellt. Falls die E-Mail-Bestätigung in Supabase aktiviert ist, muss der Bestätigungslink vor der ersten Anmeldung geöffnet werden.
+Beim ersten Start erscheint die Anmeldung. Über **Registrieren** wird ein Konto mit E-Mail-Adresse und Passwort erstellt. Falls die E-Mail-Bestätigung in Supabase aktiviert ist, muss der Bestätigungslink vor der ersten Anmeldung geöffnet werden.
 
 Zum Testen der Synchronisation:
 
@@ -121,7 +118,7 @@ Zum Testen der Synchronisation:
 2. Auf Gerät B oder im Browser dasselbe Konto verwenden.
 3. Den jeweiligen Bildschirm aktualisieren.
 
-Die Daten sollten dort ebenfalls erscheinen. SpendFox verwendet derzeit Supabase als zentrale Datenquelle; eine vollständige Offline-Warteschlange ist noch nicht enthalten.
+Die Daten sollten auch auf dem zweiten Gerät erscheinen. Eine vollständige Offline-Warteschlange ist noch nicht enthalten.
 
 ## Qualitätsprüfungen
 
@@ -135,11 +132,10 @@ npm run bundle:web
 npm run doctor
 ```
 
-Die GitHub-Actions-CI prüft Installation, ESLint, striktes TypeScript, Unit-Tests sowie iOS- und Web-Bundles bei jedem Pull Request und bei Änderungen an `main`.
+Die GitHub-Actions-CI führt dieselben Kernprüfungen bei Pull Requests und Änderungen an `main` aus. Eine Deployment-Pipeline ist für den aktuellen Expo-Go-MVP bewusst nicht eingerichtet.
 
-## Wichtige Hinweise
+## Hinweise
 
-- Produktkäufe und Tankvorgänge fließen automatisch in die Monatsübersicht ein.
-- Bereits separat als Ausgabe erfasste Produkt- oder Tankkäufe sollten nicht nochmals angelegt werden, da sie sonst doppelt gezählt werden.
 - Daten aus der früheren lokalen SQLite-Version werden nicht automatisch übernommen.
-- App-Icon, Splash-Grafik und Anmeldelogo sind im Repository versioniert.
+- Der Fahrzeugbereich unterstützt aktuell Stammdaten, Tankvorgänge und Teilelisten.
+- Excel-Import und -Export sind noch nicht enthalten.

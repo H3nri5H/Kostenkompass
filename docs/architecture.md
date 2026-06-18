@@ -1,46 +1,34 @@
 # Architektur
 
-## Zielzustand des MVP
-
-Der MVP ist eine lokale mobile Anwendung. Expo/React Native liefert eine gemeinsame Codebasis für iOS und Android. SQLite speichert alle Daten auf dem Gerät, sodass weder Backend noch Cloud-Datenbank benötigt werden.
+Kostenkompass verwendet Expo und React Native für iOS, Android und Web. Supabase stellt Anmeldung, API und PostgreSQL bereit.
 
 ```text
-Expo Router / React Native
-           |
-           v
-Screens und UI-Komponenten
-           |
-           v
-Repository-Funktionen
-           |
-           v
-lokale SQLite-Datenbank
+App-Routen und UI
+        |
+        v
+Repository-Funktionen in src/db
+        |
+        v
+Supabase API und PostgreSQL
 ```
 
-Fachliche Berechnungen liegen in `src/domain` und sind unabhängig von React Native und SQLite. Dadurch können sie isoliert getestet und später auch auf einem Server wiederverwendet werden.
+## Verzeichnisstruktur
+
+- `app`: Routen und Screens
+- `src/components`: wiederverwendbare UI
+- `src/domain`: Modelle, Berechnungen und Formatierung
+- `src/db`: Datenzugriff
+- `src/auth`: Anmeldung und Sitzung
+- `supabase/migrations`: Datenbankschema und Zugriffsregeln
 
 ## Datenmodell
 
-- `categories`: vordefinierte Kostenkategorien
-- `expenses`: tatsächliche Zahlungen
-- `assets`: langlebige Produkte mit geplanter Nutzungsdauer
+Die zentralen Tabellen sind `categories`, `expenses`, `assets`, `vehicles`, `vehicle_fuel_entries` und `vehicle_parts`. Benutzerdaten werden über die jeweilige Benutzer-ID getrennt.
 
-Geldbeträge werden als ganze Cent-Werte gespeichert. Datensätze verwenden UUIDs sowie `created_at`, `updated_at` und `deleted_at`. Diese Felder erleichtern eine spätere Synchronisation.
+## Synchronisation
 
-## Spätere Skalierung
+Supabase ist die zentrale Datenquelle. Die App schreibt Änderungen direkt in die Cloud und lädt Daten beim Öffnen oder Aktualisieren eines Screens neu. Eine vollständige Offline-Synchronisation ist noch nicht enthalten.
 
-Die lokale Datenbank bleibt als Offline-Speicher bestehen. Eine spätere Online-Version ergänzt eine authentifizierte API und PostgreSQL:
+## CI
 
-```text
-iPhone-App -> HTTPS-API -> PostgreSQL
-     |
-     +-> lokale SQLite-Datenbank und Sync-Warteschlange
-```
-
-Die App erhält niemals administrative Datenbank-Zugangsdaten. Konflikte und Löschungen müssen durch eine explizite Synchronisationsstrategie behandelt werden.
-
-## CI und CD
-
-GitHub Actions prüft Formatierung, Linting, TypeScript, Unit-Tests und die Erzeugung eines iOS-JavaScript-Bundles. Das ist Continuous Integration.
-
-Continuous Deployment ist im Expo-Go-MVP nicht sinnvoll: Ein installierbares iPhone-Binary benötigt Signierung und für cloudbasierte Geräte-Builds ein kostenpflichtiges Apple-Developer-Konto. Nach dieser Entscheidung kann eine separate, manuell freigegebene EAS-/TestFlight-Pipeline ergänzt werden.
+Eine GitHub-Actions-Pipeline prüft Formatierung, ESLint, TypeScript, Unit-Tests sowie iOS- und Web-Bundles. Deployment wird erst bei einem festgelegten Store-Prozess ergänzt.

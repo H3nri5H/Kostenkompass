@@ -1,6 +1,6 @@
 {
-  "name": "spendfox-mobile",
-  "version": "0.3.0",
+  "name": "kostenkompass-mobile",
+  "version": "0.2.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {

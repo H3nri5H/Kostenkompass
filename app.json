@@ -1,45 +1,25 @@
 {
   "expo": {
-    "name": "SpendFox",
-    "slug": "spendfox",
-    "version": "0.3.0",
+    "name": "Kostenkompass",
+    "slug": "kostenkompass-mobile",
+    "version": "0.2.0",
     "orientation": "portrait",
-    "scheme": "spendfox",
+    "scheme": "kostenkompass",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "de.h3nri5h.spendfox"
+      "bundleIdentifier": "de.h3nri5h.kostenkompass"
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "de.h3nri5h.spendfox",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFF8F2"
-      }
+      "package": "de.h3nri5h.kostenkompass"
     },
     "web": {
-      "output": "static",
-      "favicon": "./assets/favicon.png"
+      "output": "static"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/spendfox-mark.png",
-          "imageWidth": 220,
-          "resizeMode": "contain",
-          "backgroundColor": "#FFF8F2",
-          "dark": {
-            "backgroundColor": "#151210"
-          }
-        }
-      ]
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     }

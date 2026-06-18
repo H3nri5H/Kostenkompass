@@ -5,13 +5,10 @@ import type {
   Vehicle,
   VehicleFuelEntry,
   VehicleFuelType,
-  VehicleInput,
   VehiclePart,
-  VehiclePartInput,
   VehiclePartStatus,
   VehicleSummary,
 } from '@/domain/models';
-import { getPartServiceState } from '@/domain/vehicle-due';
 import { getAuthenticatedUserId, supabase } from '@/lib/supabase';
 
 interface VehicleRow {
@@ -26,8 +23,6 @@ interface VehicleRow {
   engine_code: string | null;
   transmission_code: string | null;
   first_registration_year: number | null;
-  last_inspection_on: string | null;
-  next_inspection_on: string | null;
   notes: string | null;
   created_at: string;
 }
@@ -56,9 +51,8 @@ interface PartRow {
   part_number: string | null;
   specification: string | null;
   location: string | null;
-  product_url: string | null;
-  last_replaced_odometer_km: number | null;
-  replacement_interval_km: number | null;
+  quantity_on_hand: number | string | null;
+  reorder_threshold: number | string | null;
   status: string;
   note: string | null;
   created_at: string;
@@ -76,8 +70,6 @@ const VEHICLE_COLUMNS = `
   engine_code,
   transmission_code,
   first_registration_year,
-  last_inspection_on,
-  next_inspection_on,
   notes,
   created_at
 `;
@@ -106,9 +98,8 @@ const PART_COLUMNS = `
   part_number,
   specification,
   location,
-  product_url,
-  last_replaced_odometer_km,
-  replacement_interval_km,
+  quantity_on_hand,
+  reorder_threshold,
   status,
   note,
   created_at
@@ -127,8 +118,6 @@ function mapVehicle(row: VehicleRow): Vehicle {
     engineCode: row.engine_code,
     transmissionCode: row.transmission_code,
     firstRegistrationYear: row.first_registration_year,
-    lastInspectionOn: row.last_inspection_on,
-    nextInspectionOn: row.next_inspection_on,
     notes: row.notes,
     createdAt: row.created_at,
   };
@@ -162,17 +151,19 @@ function mapPart(row: PartRow): VehiclePart {
     partNumber: row.part_number,
     specification: row.specification,
     location: row.location,
-    productUrl: row.product_url,
-    lastReplacedOdometerKm: row.last_replaced_odometer_km,
-    replacementIntervalKm: row.replacement_interval_km,
+    quantityOnHand: row.quantity_on_hand === null ? null : Number(row.quantity_on_hand),
+    reorderThreshold: row.reorder_threshold === null ? null : Number(row.reorder_threshold),
     status: row.status as VehiclePartStatus,
     note: row.note,
     createdAt: row.created_at,
   };
 }
 
-function vehiclePayload(input: VehicleInput) {
-  return {
+export async function createVehicle(input: CreateVehicleInput): Promise<void> {
+  const userId = await getAuthenticatedUserId();
+  const response = await supabase.from('vehicles').insert({
+    id: input.id,
+    user_id: userId,
     display_name: input.displayName.trim(),
     manufacturer: input.manufacturer?.trim() || null,
     model: input.model?.trim() || null,
@@ -183,47 +174,12 @@ function vehiclePayload(input: VehicleInput) {
     engine_code: input.engineCode?.trim() || null,
     transmission_code: input.transmissionCode?.trim() || null,
     first_registration_year: input.firstRegistrationYear,
-    last_inspection_on: input.lastInspectionOn,
-    next_inspection_on: input.nextInspectionOn,
     notes: input.notes?.trim() || null,
-  };
-}
+  });
 
-function partPayload(input: VehiclePartInput) {
-  return {
-    vehicle_id: input.vehicleId,
-    name: input.name.trim(),
-    manufacturer: input.manufacturer?.trim() || null,
-    part_number: input.partNumber?.trim() || null,
-    specification: input.specification?.trim() || null,
-    location: input.location?.trim() || null,
-    product_url: input.productUrl?.trim() || null,
-    last_replaced_odometer_km: input.lastReplacedOdometerKm,
-    replacement_interval_km: input.replacementIntervalKm,
-    status: input.status,
-    note: input.note?.trim() || null,
-  };
-}
-
-export async function createVehicle(input: CreateVehicleInput): Promise<void> {
-  const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicles')
-    .insert({ id: input.id, user_id: userId, ...vehiclePayload(input) });
-
-  if (response.error) throw response.error;
-}
-
-export async function updateVehicle(vehicleId: string, input: VehicleInput): Promise<void> {
-  const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicles')
-    .update(vehiclePayload(input))
-    .eq('id', vehicleId)
-    .eq('user_id', userId)
-    .is('deleted_at', null);
-
-  if (response.error) throw response.error;
+  if (response.error) {
+    throw response.error;
+  }
 }
 
 export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
@@ -235,10 +191,14 @@ export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
-  if (vehiclesResponse.error) throw vehiclesResponse.error;
+  if (vehiclesResponse.error) {
+    throw vehiclesResponse.error;
+  }
 
   const vehicles = ((vehiclesResponse.data ?? []) as VehicleRow[]).map(mapVehicle);
-  if (vehicles.length === 0) return [];
+  if (vehicles.length === 0) {
+    return [];
+  }
 
   const vehicleIds = vehicles.map((vehicle) => vehicle.id);
   const [fuelResponse, partsResponse] = await Promise.all([
@@ -256,26 +216,33 @@ export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
       .is('deleted_at', null),
   ]);
 
-  if (fuelResponse.error) throw fuelResponse.error;
-  if (partsResponse.error) throw partsResponse.error;
+  if (fuelResponse.error) {
+    throw fuelResponse.error;
+  }
+
+  if (partsResponse.error) {
+    throw partsResponse.error;
+  }
 
   const fuelEntries = ((fuelResponse.data ?? []) as FuelEntryRow[]).map(mapFuelEntry);
   const parts = ((partsResponse.data ?? []) as PartRow[]).map(mapPart);
 
   return vehicles.map((vehicle) => {
     const vehicleFuelEntries = fuelEntries.filter((entry) => entry.vehicleId === vehicle.id);
-    const vehicleParts = parts.filter((part) => part.vehicleId === vehicle.id);
-    const lastOdometerKm =
-      vehicleFuelEntries.length === 0
-        ? null
-        : Math.max(...vehicleFuelEntries.map((entry) => entry.odometerKm));
     const entriesWithConsumption = vehicleFuelEntries.filter(
       (entry) => entry.consumptionLitersPer100Km !== null,
     );
+    const openPartCount = parts.filter(
+      (part) =>
+        part.vehicleId === vehicle.id && ['low_stock', 'needed', 'ordered'].includes(part.status),
+    ).length;
 
     return {
       vehicle,
-      lastOdometerKm,
+      lastOdometerKm:
+        vehicleFuelEntries.length === 0
+          ? null
+          : Math.max(...vehicleFuelEntries.map((entry) => entry.odometerKm)),
       averageConsumptionLitersPer100Km:
         entriesWithConsumption.length === 0
           ? null
@@ -286,12 +253,7 @@ export async function listVehicleSummaries(): Promise<VehicleSummary[]> {
       totalFuelCostCents: vehicleFuelEntries.reduce((sum, entry) => sum + entry.totalCostCents, 0),
       totalLiters: vehicleFuelEntries.reduce((sum, entry) => sum + entry.liters, 0),
       fuelEntryCount: vehicleFuelEntries.length,
-      openPartCount: vehicleParts.filter((part) =>
-        ['low_stock', 'needed', 'ordered'].includes(part.status),
-      ).length,
-      dueServicePartCount: vehicleParts.filter(
-        (part) => getPartServiceState(part, lastOdometerKm).state === 'due',
-      ).length,
+      openPartCount,
     };
   });
 }
@@ -306,7 +268,10 @@ export async function getVehicle(vehicleId: string): Promise<Vehicle> {
     .is('deleted_at', null)
     .single();
 
-  if (response.error) throw response.error;
+  if (response.error) {
+    throw response.error;
+  }
+
   return mapVehicle(response.data as VehicleRow);
 }
 
@@ -326,7 +291,9 @@ export async function createVehicleFuelEntry(input: CreateVehicleFuelEntryInput)
     note: input.note?.trim() || null,
   });
 
-  if (response.error) throw response.error;
+  if (response.error) {
+    throw response.error;
+  }
 }
 
 export async function listVehicleFuelEntries(vehicleId: string): Promise<VehicleFuelEntry[]> {
@@ -340,61 +307,33 @@ export async function listVehicleFuelEntries(vehicleId: string): Promise<Vehicle
     .order('occurred_on', { ascending: false })
     .order('created_at', { ascending: false });
 
-  if (response.error) throw response.error;
-  return ((response.data ?? []) as FuelEntryRow[]).map(mapFuelEntry);
-}
+  if (response.error) {
+    throw response.error;
+  }
 
-export async function listVehicleFuelEntriesInRange(
-  start: string,
-  endExclusive: string,
-): Promise<VehicleFuelEntry[]> {
-  const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicle_fuel_entries')
-    .select(FUEL_COLUMNS)
-    .eq('user_id', userId)
-    .is('deleted_at', null)
-    .gte('occurred_on', start)
-    .lt('occurred_on', endExclusive)
-    .order('occurred_on', { ascending: false });
-
-  if (response.error) throw response.error;
   return ((response.data ?? []) as FuelEntryRow[]).map(mapFuelEntry);
 }
 
 export async function createVehiclePart(input: CreateVehiclePartInput): Promise<void> {
   const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicle_parts')
-    .insert({ id: input.id, user_id: userId, ...partPayload(input) });
+  const response = await supabase.from('vehicle_parts').insert({
+    id: input.id,
+    user_id: userId,
+    vehicle_id: input.vehicleId,
+    name: input.name.trim(),
+    manufacturer: input.manufacturer?.trim() || null,
+    part_number: input.partNumber?.trim() || null,
+    specification: input.specification?.trim() || null,
+    location: input.location?.trim() || null,
+    quantity_on_hand: input.quantityOnHand,
+    reorder_threshold: input.reorderThreshold,
+    status: input.status,
+    note: input.note?.trim() || null,
+  });
 
-  if (response.error) throw response.error;
-}
-
-export async function updateVehiclePart(partId: string, input: VehiclePartInput): Promise<void> {
-  const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicle_parts')
-    .update(partPayload(input))
-    .eq('id', partId)
-    .eq('user_id', userId)
-    .is('deleted_at', null);
-
-  if (response.error) throw response.error;
-}
-
-export async function getVehiclePart(partId: string): Promise<VehiclePart> {
-  const userId = await getAuthenticatedUserId();
-  const response = await supabase
-    .from('vehicle_parts')
-    .select(PART_COLUMNS)
-    .eq('id', partId)
-    .eq('user_id', userId)
-    .is('deleted_at', null)
-    .single();
-
-  if (response.error) throw response.error;
-  return mapPart(response.data as PartRow);
+  if (response.error) {
+    throw response.error;
+  }
 }
 
 export async function listVehicleParts(vehicleId: string): Promise<VehiclePart[]> {
@@ -408,6 +347,9 @@ export async function listVehicleParts(vehicleId: string): Promise<VehiclePart[]
     .order('status', { ascending: false })
     .order('name', { ascending: true });
 
-  if (response.error) throw response.error;
+  if (response.error) {
+    throw response.error;
+  }
+
   return ((response.data ?? []) as PartRow[]).map(mapPart);
 }

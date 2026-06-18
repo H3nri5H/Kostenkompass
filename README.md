@@ -17,16 +17,14 @@ Docker ist nicht erforderlich.
 ```powershell
 git clone https://github.com/H3nri5H/Kostenkompass.git
 cd Kostenkompass
-git switch polish
 npm ci
 ```
 
 Bei einem bereits vorhandenen Projektordner:
 
 ```powershell
-git fetch origin
-git switch polish
-git pull origin polish
+git switch main
+git pull origin main
 npm ci
 ```
 
@@ -128,17 +126,20 @@ Die Daten sollten dort ebenfalls erscheinen. SpendFox verwendet derzeit Supabase
 ## Qualitätsprüfungen
 
 ```powershell
-npm run verify
+npm run format:check
+npm run lint
+npm run typecheck
+npm test -- --runInBand
 npm run bundle:ios
 npm run bundle:web
 npm run doctor
 ```
 
-Die GitHub-Actions-CI führt Formatprüfung, ESLint, striktes TypeScript, Unit-Tests sowie iOS- und Web-Bundles bei jedem Pull Request aus.
+Die GitHub-Actions-CI prüft Installation, ESLint, striktes TypeScript, Unit-Tests sowie iOS- und Web-Bundles bei jedem Pull Request und bei Änderungen an `main`.
 
 ## Wichtige Hinweise
 
 - Produktkäufe und Tankvorgänge fließen automatisch in die Monatsübersicht ein.
 - Bereits separat als Ausgabe erfasste Produkt- oder Tankkäufe sollten nicht nochmals angelegt werden, da sie sonst doppelt gezählt werden.
 - Daten aus der früheren lokalen SQLite-Version werden nicht automatisch übernommen.
-- App-Icon, Splash-Grafik und Anmeldelogo werden aus den versionierten SVG-Quellen unter `branding/` generiert.
+- App-Icon, Splash-Grafik und Anmeldelogo sind im Repository versioniert.

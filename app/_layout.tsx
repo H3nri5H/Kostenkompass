@@ -56,6 +56,19 @@ function RootNavigator() {
             name="assets/new"
             options={{ presentation: 'modal', title: 'Neues Produkt' }}
           />
+          <Stack.Screen
+            name="cars/new"
+            options={{ presentation: 'modal', title: 'Auto erfassen' }}
+          />
+          <Stack.Screen name="cars/detail" options={{ title: 'Auto' }} />
+          <Stack.Screen
+            name="cars/fuel/new"
+            options={{ presentation: 'modal', title: 'Tankvorgang' }}
+          />
+          <Stack.Screen
+            name="cars/parts/new"
+            options={{ presentation: 'modal', title: 'Teil erfassen' }}
+          />
         </Stack.Protected>
       </Stack>
     </>

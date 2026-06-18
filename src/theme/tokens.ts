@@ -44,7 +44,7 @@ export const lightTheme: AppTheme = {
     warning: '#9A5A00',
     info: '#356B9B',
     shadow: '#241B17',
-    white: '#FFFFFF',
+    white: '#241B17',
   },
 };
 
@@ -69,6 +69,6 @@ export const darkTheme: AppTheme = {
     warning: '#F0B24C',
     info: '#7EAFE3',
     shadow: '#000000',
-    white: '#FFFFFF',
+    white: '#151210',
   },
 };

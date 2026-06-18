@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      expo:
+        patterns:
+          - expo
+          - expo-*
+          - '@expo/*'
+      react-native:
+        patterns:
+          - react
+          - react-dom
+          - react-native
+          - react-native-*
+          - '@react-native*'
+          - '@react-navigation/*'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

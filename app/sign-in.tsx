@@ -1,7 +1,14 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAuthErrorMessage } from '@/auth/auth-errors';
@@ -56,16 +63,15 @@ export default function SignInScreen() {
       <SafeAreaView style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.brand}>
-            <View style={[styles.logo, { backgroundColor: theme.colors.primary }]}>
-              <Ionicons
-                color={theme.dark ? theme.colors.background : theme.colors.white}
-                name="compass-outline"
-                size={34}
-              />
-            </View>
-            <Text style={[styles.brandName, { color: theme.colors.text }]}>Kostenkompass</Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-              Melde dich an, um deine Daten sicher auf allen Geräten zu verwenden.
+            <Image
+              accessibilityLabel="SpendFox Fuchslogo"
+              resizeMode="contain"
+              source={require('../assets/spendfox-mark.png')}
+              style={styles.logo}
+            />
+            <Text style={[styles.brandName, { color: theme.colors.text }]}>SpendFox</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}> 
+              Behalte Ausgaben, Produkte und Fahrzeuge clever im Blick – auf all deinen Geräten.
             </Text>
           </View>
 
@@ -73,10 +79,8 @@ export default function SignInScreen() {
             <Text style={[styles.title, { color: theme.colors.text }]}>Anmelden</Text>
 
             {setupError ? (
-              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}>
-                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>
-                  {setupError}
-                </Text>
+              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}> 
+                <Text style={[styles.noticeText, { color: theme.colors.danger }]}>{setupError}</Text>
               </View>
             ) : null}
 
@@ -104,7 +108,7 @@ export default function SignInScreen() {
             />
 
             {error ? (
-              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}>
+              <View style={[styles.notice, { backgroundColor: theme.colors.dangerSoft }]}> 
                 <Text style={[styles.noticeText, { color: theme.colors.danger }]}>{error}</Text>
               </View>
             ) : null}
@@ -144,17 +148,14 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   logo: {
-    width: 66,
-    height: 66,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
+    width: 126,
+    height: 126,
+    marginBottom: -4,
   },
   brandName: {
-    fontSize: 31,
+    fontSize: 34,
     fontWeight: '900',
-    letterSpacing: -1,
+    letterSpacing: -1.2,
   },
   subtitle: {
     maxWidth: 420,

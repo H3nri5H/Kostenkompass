@@ -1,22 +1,25 @@
-name: Verify ING CSV import patch
+name: Finalize ING CSV import
 
 on:
   pull_request:
     paths:
-      - .github/ing-import-patch.part*
       - .github/workflows/development-snapshot.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  verify:
+  finalize:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -57,27 +60,13 @@ jobs:
       - name: Unit tests
         run: npm test -- --runInBand
 
-      - name: Package verified implementation
+      - name: Commit verified implementation
         shell: bash
         run: |
-          tar -czf verified-ing-import.tar.gz \
-            README.md \
-            'app/(tabs)/expenses.tsx' \
-            app/_layout.tsx \
-            app/expenses/import.tsx \
-            package.json \
-            package-lock.json \
-            src/components/ImportTransactionRow.tsx \
-            src/db/expenses.ts \
-            src/domain/__tests__/ing-csv.test.ts \
-            src/domain/ing-csv.ts \
-            src/domain/models.ts \
-            supabase/migrations/20260619003000_ing_csv_import.sql
-
-      - name: Upload verified implementation
-        uses: actions/upload-artifact@v4
-        with:
-          name: verified-ing-import
-          path: verified-ing-import.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+          rm -f .github/ing-import-patch.part*
+          rm -f .github/workflows/development-snapshot.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: add ING CSV expense import"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

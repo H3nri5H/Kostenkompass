@@ -53,9 +53,3 @@ export function validateYear(value: number | null): string | null {
   if (value === null) return null;
   return value >= 1900 && value <= 2100 ? null : 'Das Jahr muss zwischen 1900 und 2100 liegen.';
 }
-
-export function validateNonNegativeInteger(value: number | null, label: string): string | null {
-  return value !== null && Number.isSafeInteger(value) && value >= 0
-    ? null
-    : `${label} muss eine nicht negative ganze Zahl sein.`;
-}

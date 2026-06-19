@@ -23,12 +23,23 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - name: Reassemble and verify patch
+      - name: Reassemble and apply patch
         shell: bash
         run: |
-          cat .github/ing-import-patch.part* > /tmp/ing-import-patch.gz.b64
+          cat \
+            .github/ing-import-patch.part00 \
+            .github/ing-import-patch.part01 \
+            .github/ing-import-patch.part02 \
+            > /tmp/ing-import-patch.gz.b64
+          base64 --decode .github/ing-import-patch.part03 >> /tmp/ing-import-patch.gz.b64
+          cat .github/ing-import-patch.part04 >> /tmp/ing-import-patch.gz.b64
+          base64 --decode .github/ing-import-patch.part05 >> /tmp/ing-import-patch.gz.b64
+          cat \
+            .github/ing-import-patch.part06 \
+            .github/ing-import-patch.part07 \
+            >> /tmp/ing-import-patch.gz.b64
           base64 --decode /tmp/ing-import-patch.gz.b64 > /tmp/ing-import-patch.gz
-          echo "dc7f545cc744cbf89a9e27e01555504f715f4484295d2604985b914524e06fd7  /tmp/ing-import-patch.gz" | sha256sum --check
+          echo "df8e1584223ef158729e19317f2cb719ca6cdc65c18151f5ec79527a1905c4bb  /tmp/ing-import-patch.gz" | sha256sum --check
           gzip --decompress --stdout /tmp/ing-import-patch.gz > /tmp/ing-import.patch
           git apply --check /tmp/ing-import.patch
           git apply --whitespace=nowarn /tmp/ing-import.patch
@@ -39,10 +50,19 @@ jobs:
       - name: Format implementation
         run: npm run format
 
-      - name: Package formatted implementation
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test -- --runInBand
+
+      - name: Package verified implementation
         shell: bash
         run: |
-          tar -czf formatted-ing-import.tar.gz \
+          tar -czf verified-ing-import.tar.gz \
             README.md \
             'app/(tabs)/expenses.tsx' \
             app/_layout.tsx \
@@ -56,45 +76,10 @@ jobs:
             src/domain/models.ts \
             supabase/migrations/20260619003000_ing_csv_import.sql
 
-      - name: Upload formatted implementation
+      - name: Upload verified implementation
         uses: actions/upload-artifact@v4
         with:
-          name: formatted-ing-import
-          path: formatted-ing-import.tar.gz
+          name: verified-ing-import
+          path: verified-ing-import.tar.gz
           if-no-files-found: error
           retention-days: 1
-
-      - name: Lint
-        id: lint
-        continue-on-error: true
-        run: npm run lint > lint-output.txt 2>&1
-
-      - name: Type-check
-        id: typecheck
-        continue-on-error: true
-        run: npm run typecheck > typecheck-output.txt 2>&1
-
-      - name: Unit tests
-        id: tests
-        continue-on-error: true
-        run: npm test -- --runInBand > test-output.txt 2>&1
-
-      - name: Upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: verification-diagnostics
-          path: |
-            lint-output.txt
-            typecheck-output.txt
-            test-output.txt
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Verify all checks
-        if: always()
-        shell: bash
-        run: |
-          test "${{ steps.lint.outcome }}" = success
-          test "${{ steps.typecheck.outcome }}" = success
-          test "${{ steps.tests.outcome }}" = success

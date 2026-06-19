@@ -33,8 +33,13 @@ jobs:
       - name: Resolve Expo-compatible import packages
         run: npx expo install expo-document-picker expo-file-system
 
-      - name: Package dependency manifests
-        run: tar -czf dependency-update.tar.gz package.json package-lock.json
+      - name: Package dependency manifests and type declarations
+        run: |
+          tar -czf dependency-update.tar.gz \
+            package.json \
+            package-lock.json \
+            node_modules/expo-document-picker/build \
+            node_modules/expo-file-system/build
 
       - name: Upload dependency manifests
         uses: actions/upload-artifact@v4

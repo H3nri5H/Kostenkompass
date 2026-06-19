@@ -61,6 +61,10 @@ function RootNavigator() {
             options={{ presentation: 'modal', title: 'Neue Ausgabe' }}
           />
           <Stack.Screen
+            name="expenses/import"
+            options={{ presentation: 'modal', title: 'ING-Umsätze importieren' }}
+          />
+          <Stack.Screen
             name="assets/new"
             options={{ presentation: 'modal', title: 'Neues Produkt' }}
           />

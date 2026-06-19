@@ -36,11 +36,12 @@ Erstelle in Supabase ein kostenloses Projekt und führe im **SQL Editor** diese 
 supabase/migrations/20260618153000_auth_sync.sql
 supabase/migrations/20260618172000_vehicle_logbook.sql
 supabase/migrations/20260618190000_vehicle_service_fields.sql
+supabase/migrations/20260619003000_ing_csv_import.sql
 ```
 
 Die Migrationen erstellen Benutzerkonten-Anbindung, Kategorien, Ausgaben, Produkte, Fahrzeuge, Tankvorgänge, Teilespezifikationen sowie die Row-Level-Security-Regeln. Jeder angemeldete Benutzer darf ausschließlich seine eigenen Datensätze lesen und verändern.
 
-Wurde das Projekt bereits mit den ersten beiden Migrationen eingerichtet, muss nur noch `20260618190000_vehicle_service_fields.sql` ausgeführt werden.
+Wurde das Projekt bereits eingerichtet, führe nur die noch fehlenden Migrationen in zeitlicher Reihenfolge aus. Für den ING-Dateiimport wird `20260619003000_ing_csv_import.sql` benötigt.
 
 ## Lokale Konfiguration
 
@@ -75,6 +76,15 @@ npm run start:tunnel
 ```
 
 Für diesen Testweg werden weder Android Studio noch ein Android SDK benötigt.
+
+## ING-Umsätze importieren
+
+1. Öffne im ING-Online-Banking die Umsatzanzeige und exportiere die bereits gebuchten Umsätze als CSV-Datei.
+2. Öffne in SpendFox **Ausgaben** und wähle **ING-CSV importieren**.
+3. Prüfe die erkannten Belastungen, Kategorie-Vorschläge und die ausgewählte Summe.
+4. Bestätige nur die Buchungen, die als Ausgaben übernommen werden sollen.
+
+Die Datei wird lokal auf dem Gerät ausgewertet. SpendFox speichert nur bestätigte Belastungen; Gutschriften werden ausgelassen. Wertpapierkäufe sind aus Sicherheitsgründen zunächst nicht vorausgewählt. Wiederholte Importe derselben Buchung werden über einen konto- und transaktionsbezogenen Fingerprint verhindert.
 
 ## Im Browser starten
 

@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppButton } from '@/components/AppButton';
 import { EmptyState } from '@/components/EmptyState';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { PageHeader } from '@/components/PageHeader';
@@ -93,7 +94,7 @@ export default function ExpensesScreen() {
           ) : (
             <SurfaceCard>
               <EmptyState
-                description="Erfasse deine erste Zahlung mit Betrag, Datum und Kategorie."
+                description="Erfasse eine Zahlung manuell oder importiere gebuchte ING-Umsätze."
                 icon="receipt-outline"
                 title="Noch keine Ausgaben"
               />
@@ -108,8 +109,15 @@ export default function ExpensesScreen() {
                 label: 'Neue Ausgabe',
                 onPress: () => router.push('/expenses/new'),
               }}
-              description="Deine Zahlungen werden mit deinem Konto synchronisiert."
+              description="Manuell erfasste und importierte Zahlungen an einem Ort."
               title="Ausgaben"
+            />
+            <AppButton
+              icon="download-outline"
+              label="ING-CSV importieren"
+              onPress={() => router.push('/expenses/import')}
+              style={styles.importButton}
+              variant="secondary"
             />
             {expenses.length > 0 ? (
               <View style={[styles.summary, { backgroundColor: theme.colors.primarySoft }]}>
@@ -149,6 +157,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { flexGrow: 1, paddingHorizontal: 18, paddingTop: 12, paddingBottom: 36 },
   header: { gap: 19, marginBottom: 18 },
+  importButton: { alignSelf: 'flex-start' },
   summary: {
     borderRadius: 18,
     padding: 16,

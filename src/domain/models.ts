@@ -39,6 +39,13 @@ export interface CreateExpenseInput {
   note: string | null;
 }
 
+export type ExpenseImportSource = 'ing_csv';
+
+export interface CreateImportedExpenseInput extends CreateExpenseInput {
+  importSource: ExpenseImportSource;
+  importFingerprint: string;
+}
+
 export interface Asset {
   id: string;
   categoryId: string;

@@ -17,13 +17,7 @@ jobs:
 
       - name: Create source archive
         shell: bash
-        run: |
-          tar \
-            --exclude=.git \
-            --exclude=node_modules \
-            --exclude=.env \
-            --exclude=source.tar.gz \
-            -czf source.tar.gz .
+        run: git ls-files -z | tar --null -T - -czf source.tar.gz
 
       - name: Upload source archive
         uses: actions/upload-artifact@v4

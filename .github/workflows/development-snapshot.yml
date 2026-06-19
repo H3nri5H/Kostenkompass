@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - .github/ing-import-patch.part*
+      - .github/workflows/development-snapshot.yml
 
 permissions:
   contents: read
@@ -26,26 +27,23 @@ jobs:
       - name: Reassemble and apply patch
         shell: bash
         run: |
-          cat \
-            .github/ing-import-patch.part00 \
-            .github/ing-import-patch.part01 \
-            .github/ing-import-patch.part02 \
-            > /tmp/ing-import-patch.gz.b64
-          base64 --decode .github/ing-import-patch.part03 >> /tmp/ing-import-patch.gz.b64
-          cat .github/ing-import-patch.part04 >> /tmp/ing-import-patch.gz.b64
-          base64 --decode .github/ing-import-patch.part05 >> /tmp/ing-import-patch.gz.b64
-          cat \
-            .github/ing-import-patch.part06 \
-            .github/ing-import-patch.part07 \
-            >> /tmp/ing-import-patch.gz.b64
+          cat .github/ing-import-patch.part* > /tmp/ing-import-patch.gz.b64
           base64 --decode /tmp/ing-import-patch.gz.b64 > /tmp/ing-import-patch.gz
-          echo "df8e1584223ef158729e19317f2cb719ca6cdc65c18151f5ec79527a1905c4bb  /tmp/ing-import-patch.gz" | sha256sum --check
+          echo "dc7f545cc744cbf89a9e27e01555504f715f4484295d2604985b914524e06fd7  /tmp/ing-import-patch.gz" | sha256sum --check
           gzip --decompress --stdout /tmp/ing-import-patch.gz > /tmp/ing-import.patch
           git apply --check /tmp/ing-import.patch
           git apply --whitespace=nowarn /tmp/ing-import.patch
 
+      - name: Correct optional purpose handling
+        shell: bash
+        run: |
+          sed -i '/const parts = \[transaction.bookingText, transaction.purpose\]/,/\.map(normalizeWhitespace)/ s/    \.map(normalizeWhitespace)/    .filter((value): value is string => value !== null)\n    .map(normalizeWhitespace)/' src/domain/ing-csv.ts
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Apply safe lint fixes
+        run: npx expo lint --fix
 
       - name: Format implementation
         run: npm run format

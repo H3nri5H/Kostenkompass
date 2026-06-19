@@ -33,11 +33,10 @@ export default function ExpenseForm() {
   useEffect(() => {
     let mounted = true;
 
-    void listCategories()
+    void listCategories('expense')
       .then((result) => {
         if (!mounted) return;
         setCategories(result);
-        setCategoryId(result[0]?.id ?? null);
       })
       .catch((error) => {
         console.error(error);

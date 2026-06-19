@@ -22,12 +22,12 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
 });
 
 type GlobalWithSupabaseRefresh = typeof globalThis & {
-  __kostenkompassSupabaseRefreshRegistered?: boolean;
+  __spendfoxSupabaseRefreshRegistered?: boolean;
 };
 
 const globalWithRefresh = globalThis as GlobalWithSupabaseRefresh;
 
-if (Platform.OS !== 'web' && !globalWithRefresh.__kostenkompassSupabaseRefreshRegistered) {
+if (Platform.OS !== 'web' && !globalWithRefresh.__spendfoxSupabaseRefreshRegistered) {
   AppState.addEventListener('change', (state) => {
     if (state === 'active') {
       supabase.auth.startAutoRefresh();
@@ -36,7 +36,7 @@ if (Platform.OS !== 'web' && !globalWithRefresh.__kostenkompassSupabaseRefreshRe
     }
   });
 
-  globalWithRefresh.__kostenkompassSupabaseRefreshRegistered = true;
+  globalWithRefresh.__spendfoxSupabaseRefreshRegistered = true;
 }
 
 export function requireSupabaseConfiguration(): void {

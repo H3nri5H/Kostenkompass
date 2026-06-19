@@ -20,8 +20,10 @@ describe('SpendFox branding', () => {
   });
 
   it('does not expose the former product name in application source files', () => {
-    const files = [...collectSourceFiles(join(process.cwd(), 'app')), ...collectSourceFiles(join(process.cwd(), 'src'))]
-      .filter((path) => /\.(ts|tsx)$/.test(path) && !path.endsWith('branding.test.ts'));
+    const files = [
+      ...collectSourceFiles(join(process.cwd(), 'app')),
+      ...collectSourceFiles(join(process.cwd(), 'src')),
+    ].filter((path) => /\.(ts|tsx)$/.test(path) && !path.endsWith('branding.test.ts'));
 
     for (const file of files) {
       expect(readFileSync(file, 'utf8')).not.toMatch(/Kostenkompass/i);

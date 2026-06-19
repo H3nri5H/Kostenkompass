@@ -1,4 +1,9 @@
-import type { CategoryIconName, CreateExpenseInput, Expense } from '@/domain/models';
+import type {
+  CategoryIconName,
+  CreateExpenseInput,
+  CreateImportedExpenseInput,
+  Expense,
+} from '@/domain/models';
 import { getAuthenticatedUserId, supabase } from '@/lib/supabase';
 
 interface CategoryRelation {
@@ -116,4 +121,79 @@ export async function deleteExpense(id: string): Promise<void> {
   if (response.error) {
     throw response.error;
   }
+}
+
+interface ImportFingerprintRow {
+  import_fingerprint: string | null;
+}
+
+const IMPORT_FINGERPRINT_CHUNK_SIZE = 50;
+
+export async function listExistingExpenseImportFingerprints(
+  fingerprints: string[],
+): Promise<Set<string>> {
+  const uniqueFingerprints = [...new Set(fingerprints.filter(Boolean))];
+  const existing = new Set<string>();
+
+  if (uniqueFingerprints.length === 0) {
+    return existing;
+  }
+
+  const userId = await getAuthenticatedUserId();
+
+  for (let index = 0; index < uniqueFingerprints.length; index += IMPORT_FINGERPRINT_CHUNK_SIZE) {
+    const chunk = uniqueFingerprints.slice(index, index + IMPORT_FINGERPRINT_CHUNK_SIZE);
+    const response = await supabase
+      .from('expenses')
+      .select('import_fingerprint')
+      .eq('user_id', userId)
+      .eq('import_source', 'ing_csv')
+      .in('import_fingerprint', chunk);
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    for (const row of (response.data ?? []) as ImportFingerprintRow[]) {
+      if (row.import_fingerprint) {
+        existing.add(row.import_fingerprint);
+      }
+    }
+  }
+
+  return existing;
+}
+
+export async function createImportedExpenses(
+  inputs: CreateImportedExpenseInput[],
+): Promise<number> {
+  if (inputs.length === 0) {
+    return 0;
+  }
+
+  const userId = await getAuthenticatedUserId();
+  const rows = inputs.map((input) => ({
+    id: input.id,
+    user_id: userId,
+    category_id: input.categoryId,
+    amount_cents: input.amountCents,
+    occurred_on: input.occurredOn,
+    merchant: input.merchant?.trim() || null,
+    note: input.note?.trim() || null,
+    import_source: input.importSource,
+    import_fingerprint: input.importFingerprint,
+  }));
+  const response = await supabase
+    .from('expenses')
+    .upsert(rows, {
+      onConflict: 'user_id,import_source,import_fingerprint',
+      ignoreDuplicates: true,
+    })
+    .select('import_fingerprint');
+
+  if (response.error) {
+    throw response.error;
+  }
+
+  return response.data?.length ?? 0;
 }

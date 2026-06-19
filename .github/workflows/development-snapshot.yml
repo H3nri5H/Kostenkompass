@@ -9,7 +9,7 @@ permissions:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -24,5 +24,22 @@ jobs:
         with:
           name: source-snapshot
           path: source.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve Expo-compatible import packages
+        run: npx expo install expo-document-picker expo-file-system
+
+      - name: Package dependency manifests
+        run: tar -czf dependency-update.tar.gz package.json package-lock.json
+
+      - name: Upload dependency manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-update
+          path: dependency-update.tar.gz
           if-no-files-found: error
           retention-days: 1

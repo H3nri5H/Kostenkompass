@@ -1,50 +1,74 @@
-name: Development snapshot
+name: Verify ING CSV import patch
 
 on:
   pull_request:
+    paths:
+      - .github/ing-import-patch.part*
 
 permissions:
   contents: read
 
 jobs:
-  snapshot:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create source archive
-        shell: bash
-        run: git ls-files -z | tar --null -T - -czf source.tar.gz
-
-      - name: Upload source archive
-        uses: actions/upload-artifact@v4
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
         with:
-          name: source-snapshot
-          path: source.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Reassemble and verify patch
+        shell: bash
+        run: |
+          cat .github/ing-import-patch.part* > /tmp/ing-import-patch.gz.b64
+          base64 --decode /tmp/ing-import-patch.gz.b64 > /tmp/ing-import-patch.gz
+          echo "dc7f545cc744cbf89a9e27e01555504f715f4484295d2604985b914524e06fd7  /tmp/ing-import-patch.gz" | sha256sum --check
+          gzip --decompress --stdout /tmp/ing-import-patch.gz > /tmp/ing-import.patch
+          git apply --check /tmp/ing-import.patch
+          git apply --whitespace=nowarn /tmp/ing-import.patch
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Resolve Expo-compatible import packages
-        run: npx expo install expo-document-picker expo-file-system
+      - name: Format implementation
+        run: npm run format
 
-      - name: Package dependency manifests and type declarations
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test -- --runInBand
+
+      - name: Package verified implementation
+        shell: bash
         run: |
-          tar -czf dependency-update.tar.gz \
+          tar -czf verified-ing-import.tar.gz \
+            README.md \
+            'app/(tabs)/expenses.tsx' \
+            app/_layout.tsx \
+            app/expenses/import.tsx \
             package.json \
             package-lock.json \
-            node_modules/expo-document-picker/build \
-            node_modules/expo-file-system/build
+            src/components/ImportTransactionRow.tsx \
+            src/db/expenses.ts \
+            src/domain/__tests__/ing-csv.test.ts \
+            src/domain/ing-csv.ts \
+            src/domain/models.ts \
+            supabase/migrations/20260619003000_ing_csv_import.sql
 
-      - name: Upload dependency manifests
+      - name: Upload verified implementation
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-update
-          path: dependency-update.tar.gz
+          name: verified-ing-import
+          path: verified-ing-import.tar.gz
           if-no-files-found: error
           retention-days: 1

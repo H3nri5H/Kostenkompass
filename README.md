@@ -135,7 +135,7 @@ npm run bundle:web
 npm run doctor
 ```
 
-Die GitHub-Actions-CI prüft Installation, ESLint, striktes TypeScript, Unit-Tests sowie iOS- und Web-Bundles bei jedem Pull Request und bei Änderungen an `main`.
+Die GitHub-Actions-CI führt bei Änderungen an `main` sowie bei manueller Auslösung Installation, ESLint, striktes TypeScript und Unit-Tests aus. Format-, Bundle- und Expo-Doctor-Prüfungen bleiben bewusst manuell; ein Deployment findet nicht statt.
 
 ## Wichtige Hinweise
 
